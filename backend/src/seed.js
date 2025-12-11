@@ -47,6 +47,47 @@ async function seedDatabase() {
     await mongoose.connect(MONGODB_URI);
     console.log('✅ Connected to MongoDB');
 
+    // Drop all indexes and recreate them properly
+    console.log('🔧 Rebuilding indexes...');
+    try {
+      const userCollection = mongoose.connection.collection('users');
+      
+      // Drop ALL indexes except _id (which cannot be dropped)
+      const indexes = await userCollection.indexes();
+      for (const index of indexes) {
+        if (index.name !== '_id_') {
+          try {
+            await userCollection.dropIndex(index.name);
+            console.log(`✅ Dropped index: ${index.name}`);
+          } catch (err) {
+            console.log(`Could not drop ${index.name}`);
+          }
+        }
+      }
+      
+      // Force Mongoose to sync indexes from the schema
+      await User.syncIndexes();
+      console.log('✅ Synchronized indexes from User schema');
+      
+      // Verify the googleId index is sparse
+      const newIndexes = await userCollection.indexes();
+      const googleIdIndex = newIndexes.find(idx => idx.key && idx.key.googleId);
+      if (googleIdIndex) {
+        console.log(`googleId index details: sparse=${googleIdIndex.sparse}, unique=${googleIdIndex.unique}`);
+        
+        // If it's not sparse, drop it and recreate manually
+        if (!googleIdIndex.sparse) {
+          console.log('⚠️  googleId index is not sparse, fixing...');
+          await userCollection.dropIndex('googleId_1');
+          await userCollection.createIndex({ googleId: 1 }, { unique: true, sparse: true });
+          console.log('✅ Manually created sparse unique index for googleId');
+        }
+      }
+      
+    } catch (indexError) {
+      console.error('Index rebuild error:', indexError.message);
+    }
+
     // Clear all collections
     console.log('🗑️  Clearing existing data...');
     await User.deleteMany({});
@@ -82,6 +123,7 @@ async function seedDatabase() {
         premiumStatus: 'premium',
         role: 'admin',
         isVerified: true,
+        authProvider: 'local',
         joinedAt: getDaysAgo(180),
         lastLogin: getDaysAgo(0),
         level: 10,
@@ -102,6 +144,7 @@ async function seedDatabase() {
         premiumStatus: 'premium',
         role: 'moderator',
         isVerified: true,
+        authProvider: 'local',
         joinedAt: getDaysAgo(150),
         lastLogin: getDaysAgo(1),
         level: 8,
@@ -121,6 +164,7 @@ async function seedDatabase() {
         avatarUrl: 'https://i.pravatar.cc/150?img=1',
         premiumStatus: 'premium',
         isVerified: true,
+        authProvider: 'local',
         joinedAt: getDaysAgo(90),
         lastLogin: getDaysAgo(0),
         level: 5,
@@ -141,6 +185,7 @@ async function seedDatabase() {
         avatarUrl: 'https://i.pravatar.cc/150?img=5',
         premiumStatus: 'free',
         isVerified: true,
+        authProvider: 'local',
         joinedAt: getDaysAgo(60),
         lastLogin: getDaysAgo(2),
         level: 3,
@@ -160,6 +205,7 @@ async function seedDatabase() {
         avatarUrl: 'https://i.pravatar.cc/150?img=12',
         premiumStatus: 'premium',
         isVerified: true,
+        authProvider: 'local',
         joinedAt: getDaysAgo(120),
         lastLogin: getDaysAgo(0),
         level: 7,
@@ -179,6 +225,7 @@ async function seedDatabase() {
         avatarUrl: 'https://i.pravatar.cc/150?img=9',
         premiumStatus: 'free',
         isVerified: false,
+        authProvider: 'local',
         joinedAt: getDaysAgo(30),
         lastLogin: getDaysAgo(5),
         level: 2,
@@ -198,6 +245,7 @@ async function seedDatabase() {
         avatarUrl: 'https://i.pravatar.cc/150?img=15',
         premiumStatus: 'free',
         isVerified: true,
+        authProvider: 'local',
         joinedAt: getDaysAgo(45),
         lastLogin: getDaysAgo(1),
         level: 4,
