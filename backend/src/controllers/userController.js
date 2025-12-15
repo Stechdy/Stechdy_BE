@@ -73,14 +73,28 @@ exports.loginUser = async (req, res) => {
 // @access  Private
 exports.getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    console.log('👤 Fetching profile for user:', req.user._id);
+    const user = await User.findById(req.user._id).select('-passwordHash');
 
     if (user) {
+      console.log('✅ User found:', user.name, 'Streak:', user.streakCount);
       res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
+        avatarUrl: user.avatarUrl,
+        level: user.level,
+        xp: user.xp,
+        streakCount: user.streakCount,
+        premiumStatus: user.premiumStatus,
+        bio: user.bio,
+        phone: user.phone,
+        timezone: user.timezone,
+        notificationSettings: user.notificationSettings,
+        settings: user.settings,
+        joinedAt: user.joinedAt,
+        lastLogin: user.lastLogin
       });
     } else {
       res.status(404).json({ message: 'User not found' });
