@@ -64,6 +64,11 @@ const userSchema = new mongoose.Schema(
       default: 0,
       min: 0
     },
+    timezone: {
+      type: String,
+      default: 'UTC',
+      trim: true
+    },
     settings: {
       notification: {
         type: Boolean,
@@ -77,6 +82,28 @@ const userSchema = new mongoose.Schema(
         type: String,
         enum: ['public', 'private', 'friends'],
         default: 'private'
+      }
+    },
+    notificationSettings: {
+      dailyEmail: {
+        type: Boolean,
+        default: true
+      },
+      studyReminder: {
+        type: Boolean,
+        default: true
+      },
+      deadlineReminder: {
+        type: Boolean,
+        default: true
+      },
+      weeklyReport: {
+        type: Boolean,
+        default: false
+      },
+      aiSuggestions: {
+        type: Boolean,
+        default: true
       }
     },
     role: {

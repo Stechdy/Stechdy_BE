@@ -1,5 +1,6 @@
 // Export all models from a single file
 module.exports = {
+  // Original models
   User: require('./User'),
   Task: require('./Task'),
   StudySession: require('./StudySession'),
@@ -16,5 +17,17 @@ module.exports = {
   Analytics: require('./Analytics'),
   Report: require('./Report'),
   Notification: require('./Notification'),
-  SystemConfig: require('./SystemConfig')
+  SystemConfig: require('./SystemConfig'),
+  
+  // AI Scheduling System models
+  Semester: require('./Semester'),
+  Subject: require('./Subject'),
+  BusySchedule: require('./BusySchedule'),
+  StudyTimetable: require('./StudyTimetable'),
+  StudySessionSchedule: require('./StudySessionSchedule'),
+  Deadline: require('./Deadline'),
+  Reminder: require('./Reminder'),
+  NotificationLog: require('./NotificationLog'),
+  AIInput: require('./AIInput'),
+  AIGenerationResult: require('./AIGenerationResult')
 };
