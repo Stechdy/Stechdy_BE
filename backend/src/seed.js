@@ -1457,26 +1457,56 @@ async function seedDatabase() {
       }
     });
 
-    const sessionsData = aiGenerationResult.generatedSchedule.weeklySchedule[0].sessions.map(session => ({
-      timetableId: studyTimetable._id,
-      userId: alexUser._id,
-      subjectId: session.subjectId,
-      date: session.date,
-      dayOfWeek: session.dayOfWeek,
-      sessionType: session.sessionType,
-      startTime: session.startTime,
-      endTime: session.endTime,
-      topic: session.topic,
-      objectives: session.objectives,
-      plannedDuration: 90,
-      isUserEdited: false,
-      status: session.date < new Date() ? 'completed' : 'scheduled',
-      focusLevel: session.date < new Date() ? Math.floor(Math.random() * 2) + 4 : undefined,
-      wasProductived: session.date < new Date() ? true : undefined,
-      completedAt: session.date < new Date() ? session.date : undefined
-    }));
-
-    const aiStudySessions = await StudySessionSchedule.create(sessionsData);
+    // Create study sessions manually (dates from AI generation might be invalid after save)
+    const now = new Date();
+    const aiStudySessions = [];
+    
+    const sessionsToCreate = [
+      // Monday Dec 16
+      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Graph Algorithms - BFS/DFS', objectives: ['Understand BFS traversal', 'Implement DFS recursively'] },
+      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'evening', subjectId: aiSubjects[2]._id, startTime: '19:00', endTime: '20:30', topic: 'Memory Management Review', objectives: ['Study paging concepts', 'Review virtual memory'] },
+      // Tuesday Dec 17
+      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'morning', subjectId: aiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'Threads & Concurrency', objectives: ['Understand thread lifecycle', 'Study synchronization primitives'] },
+      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'afternoon', subjectId: aiSubjects[1]._id, startTime: '12:30', endTime: '14:00', topic: 'Database Project Work', objectives: ['Design schema tables', 'Write complex SQL queries'] },
+      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'evening', subjectId: aiSubjects[4]._id, startTime: '19:00', endTime: '20:30', topic: 'Eigenvalues Practice', objectives: ['Solve eigenvalue problems', 'Practice diagonalization'] },
+      // Wednesday Dec 18
+      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Graph Assignment Work', objectives: ['Code Dijkstra algorithm', 'Test with sample graphs'] },
+      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'afternoon', subjectId: aiSubjects[3]._id, startTime: '12:30', endTime: '14:00', topic: 'Portfolio Project - Final touches', objectives: ['Add animations', 'Deploy to Vercel'] },
+      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'evening', subjectId: aiSubjects[1]._id, startTime: '19:00', endTime: '21:00', topic: 'Database Project Final Push', objectives: ['Test all queries', 'Write documentation'] },
+      // Thursday Dec 19
+      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'morning', subjectId: aiSubjects[4]._id, startTime: '07:00', endTime: '08:30', topic: 'Midterm Review', objectives: ['Review all formulas', 'Practice past papers'] },
+      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'afternoon', subjectId: aiSubjects[2]._id, startTime: '12:00', endTime: '13:30', topic: 'OS Exam Preparation', objectives: ['Review lecture notes', 'Make summary sheets'] },
+      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'evening', subjectId: aiSubjects[0]._id, startTime: '19:00', endTime: '20:30', topic: 'Final Assignment Review', objectives: ['Debug graph code', 'Optimize algorithms'] },
+      // Friday Dec 20
+      { date: new Date('2025-12-20'), dayOfWeek: 5, sessionType: 'morning', subjectId: aiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'OS Final Prep', objectives: ['Practice questions', 'Review weak areas'] },
+      // Saturday Dec 21
+      { date: new Date('2025-12-21'), dayOfWeek: 6, sessionType: 'evening', subjectId: aiSubjects[0]._id, startTime: '19:00', endTime: '20:30', topic: 'Light Review', objectives: ['Review completed topics', 'Plan next week'] }
+    ];
+    
+    for (const sessionData of sessionsToCreate) {
+      const isCompleted = sessionData.date < now;
+      
+      const newSession = await StudySessionSchedule.create({
+        timetableId: studyTimetable._id,
+        userId: alexUser._id,
+        subjectId: sessionData.subjectId,
+        date: sessionData.date,
+        dayOfWeek: sessionData.dayOfWeek,
+        sessionType: sessionData.sessionType,
+        startTime: sessionData.startTime,
+        endTime: sessionData.endTime,
+        topic: sessionData.topic,
+        objectives: sessionData.objectives,
+        plannedDuration: 90,
+        isUserEdited: false,
+        status: isCompleted ? 'completed' : 'scheduled',
+        focusLevel: isCompleted ? Math.floor(Math.random() * 2) + 4 : undefined,
+        wasProductived: isCompleted ? true : undefined,
+        completedAt: isCompleted ? sessionData.date : undefined
+      });
+      
+      aiStudySessions.push(newSession);
+    }
     console.log(`✅ Created study timetable with ${aiStudySessions.length} sessions`);
 
     // Link timetable to AI generation result
@@ -1577,6 +1607,7 @@ async function seedDatabase() {
         channel: 'email',
         recipient: alexUser.email,
         title: 'Study Session Starting Soon',
+        message: 'Your DS&A study session starts in 30 minutes',
         content: 'Your DS&A study session starts in 30 minutes',
         sentAt: getDaysAgo(1),
         status: 'success',
@@ -1601,6 +1632,7 @@ async function seedDatabase() {
         channel: 'email',
         recipient: alexUser.email,
         title: 'Database Project Due Soon',
+        message: 'Your Database Project is due in 1 week',
         content: 'Your Database Project is due in 1 week',
         sentAt: getDaysAgo(8),
         status: 'success',
