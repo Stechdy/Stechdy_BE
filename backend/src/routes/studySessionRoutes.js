@@ -9,6 +9,9 @@ router.use(protect);
 // Get upcoming sessions by subject (for dashboard)
 router.get('/upcoming-by-subject', studySessionController.getUpcomingSessionsBySubject);
 
+// Get weekly schedule (for study tracker)
+router.get('/week', studySessionController.getWeeklySchedule);
+
 // Get today's sessions (for dashboard)
 router.get('/today', studySessionController.getTodaySessions);
 

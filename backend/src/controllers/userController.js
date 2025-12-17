@@ -134,3 +134,60 @@ exports.updateUserProfile = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @desc    Get user streak data
+// @route   GET /api/users/streak
+// @access  Private
+exports.getUserStreak = async (req, res) => {
+  try {
+    console.log('🔥 Fetching streak data for user:', req.user._id);
+    
+    const user = await User.findById(req.user._id);
+    const StudySessionSchedule = require('../models/StudySessionSchedule');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Calculate total study hours from completed sessions
+    const completedSessions = await StudySessionSchedule.find({
+      userId: req.user._id,
+      status: 'completed'
+    });
+
+    const totalMinutes = completedSessions.reduce((sum, session) => {
+      return sum + (session.actualDuration || session.plannedDuration || 90);
+    }, 0);
+    const totalHours = Math.floor(totalMinutes / 60);
+
+    // Get calendar data (days with study sessions in current month)
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const sessionsThisMonth = await StudySessionSchedule.find({
+      userId: req.user._id,
+      date: {
+        $gte: firstDayOfMonth,
+        $lte: lastDayOfMonth
+      },
+      status: 'completed'
+    });
+
+    // Extract unique days that have sessions
+    const activeDays = [...new Set(
+      sessionsThisMonth.map(session => new Date(session.date).getDate())
+    )];
+
+    console.log(`✅ Streak: ${user.streakCount} days, Total hours: ${totalHours}h, Active days: ${activeDays.length}`);
+
+    res.json({
+      currentStreak: user.streakCount || 0,
+      totalHours,
+      calendar: activeDays.sort((a, b) => a - b)
+    });
+  } catch (error) {
+    console.error('❌ Error fetching streak data:', error);
+    res.status(500).json({ message: error.message });
+  }
+};

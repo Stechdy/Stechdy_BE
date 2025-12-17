@@ -1462,7 +1462,29 @@ async function seedDatabase() {
     const aiStudySessions = [];
     
     const sessionsToCreate = [
-      // Monday Dec 16
+      // WEEK 49 - Monday Dec 9
+      { date: new Date('2025-12-09'), dayOfWeek: 1, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Data Structures Review', objectives: ['Review linked lists', 'Practice tree traversals'] },
+      { date: new Date('2025-12-09'), dayOfWeek: 1, sessionType: 'afternoon', subjectId: aiSubjects[1]._id, startTime: '14:00', endTime: '15:30', topic: 'SQL Basics', objectives: ['Learn SELECT queries', 'Practice JOINs'] },
+      { date: new Date('2025-12-09'), dayOfWeek: 1, sessionType: 'evening', subjectId: aiSubjects[3]._id, startTime: '19:00', endTime: '20:30', topic: 'React Components', objectives: ['Build reusable components', 'Understand props'] },
+      // Tuesday Dec 10
+      { date: new Date('2025-12-10'), dayOfWeek: 2, sessionType: 'morning', subjectId: aiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'Process Scheduling', objectives: ['Study scheduling algorithms', 'Compare FCFS vs RR'] },
+      { date: new Date('2025-12-10'), dayOfWeek: 2, sessionType: 'afternoon', subjectId: aiSubjects[4]._id, startTime: '13:00', endTime: '14:30', topic: 'Matrix Operations', objectives: ['Practice matrix multiplication', 'Learn determinants'] },
+      { date: new Date('2025-12-10'), dayOfWeek: 2, sessionType: 'evening', subjectId: aiSubjects[0]._id, startTime: '19:00', endTime: '20:30', topic: 'Algorithm Analysis', objectives: ['Big O notation', 'Time complexity'] },
+      // Wednesday Dec 11
+      { date: new Date('2025-12-11'), dayOfWeek: 3, sessionType: 'morning', subjectId: aiSubjects[1]._id, startTime: '07:00', endTime: '08:30', topic: 'Database Normalization', objectives: ['Understand 1NF, 2NF, 3NF', 'Design normalized schemas'] },
+      { date: new Date('2025-12-11'), dayOfWeek: 3, sessionType: 'afternoon', subjectId: aiSubjects[3]._id, startTime: '14:00', endTime: '15:30', topic: 'State Management', objectives: ['Learn useState', 'Practice with forms'] },
+      { date: new Date('2025-12-11'), dayOfWeek: 3, sessionType: 'evening', subjectId: aiSubjects[2]._id, startTime: '19:00', endTime: '20:30', topic: 'Memory Management', objectives: ['Study paging', 'Understand virtual memory'] },
+      // Thursday Dec 12
+      { date: new Date('2025-12-12'), dayOfWeek: 4, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Sorting Algorithms', objectives: ['Implement QuickSort', 'Compare sorting methods'] },
+      { date: new Date('2025-12-12'), dayOfWeek: 4, sessionType: 'afternoon', subjectId: aiSubjects[4]._id, startTime: '13:00', endTime: '14:30', topic: 'Vector Spaces', objectives: ['Practice linear transformations', 'Solve eigenvalue problems'] },
+      // Friday Dec 13
+      { date: new Date('2025-12-13'), dayOfWeek: 5, sessionType: 'morning', subjectId: aiSubjects[1]._id, startTime: '07:00', endTime: '08:30', topic: 'Advanced SQL', objectives: ['Learn subqueries', 'Practice views and indexes'] },
+      { date: new Date('2025-12-13'), dayOfWeek: 5, sessionType: 'afternoon', subjectId: aiSubjects[3]._id, startTime: '14:00', endTime: '15:30', topic: 'API Integration', objectives: ['Fetch data from APIs', 'Handle async operations'] },
+      // Sunday Dec 14
+      { date: new Date('2025-12-14'), dayOfWeek: 0, sessionType: 'morning', subjectId: aiSubjects[4]._id, startTime: '09:00', endTime: '10:30', topic: 'Linear Algebra Review', objectives: ['Review all topics', 'Practice exam questions'] },
+      { date: new Date('2025-12-14'), dayOfWeek: 0, sessionType: 'afternoon', subjectId: aiSubjects[0]._id, startTime: '14:00', endTime: '15:30', topic: 'Algorithm Practice', objectives: ['Solve coding problems', 'Prepare for interview'] },
+      
+      // WEEK 50 - Monday Dec 16
       { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Graph Algorithms - BFS/DFS', objectives: ['Understand BFS traversal', 'Implement DFS recursively'] },
       { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'evening', subjectId: aiSubjects[2]._id, startTime: '19:00', endTime: '20:30', topic: 'Memory Management Review', objectives: ['Study paging concepts', 'Review virtual memory'] },
       // Tuesday Dec 17
@@ -1480,7 +1502,10 @@ async function seedDatabase() {
       // Friday Dec 20
       { date: new Date('2025-12-20'), dayOfWeek: 5, sessionType: 'morning', subjectId: aiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'OS Final Prep', objectives: ['Practice questions', 'Review weak areas'] },
       // Saturday Dec 21
-      { date: new Date('2025-12-21'), dayOfWeek: 6, sessionType: 'evening', subjectId: aiSubjects[0]._id, startTime: '19:00', endTime: '20:30', topic: 'Light Review', objectives: ['Review completed topics', 'Plan next week'] }
+      { date: new Date('2025-12-21'), dayOfWeek: 6, sessionType: 'evening', subjectId: aiSubjects[0]._id, startTime: '19:00', endTime: '20:30', topic: 'Light Review', objectives: ['Review completed topics', 'Plan next week'] },
+      // Sunday Dec 22
+      { date: new Date('2025-12-22'), dayOfWeek: 0, sessionType: 'morning', subjectId: aiSubjects[3]._id, startTime: '09:00', endTime: '10:30', topic: 'Full Stack Project', objectives: ['Build complete CRUD app', 'Deploy to production'] },
+      { date: new Date('2025-12-22'), dayOfWeek: 0, sessionType: 'afternoon', subjectId: aiSubjects[4]._id, startTime: '14:00', endTime: '15:30', topic: 'Math Review', objectives: ['Practice problems', 'Prepare for next week'] }
     ];
     
     for (const sessionData of sessionsToCreate) {

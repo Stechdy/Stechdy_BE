@@ -80,7 +80,7 @@ const studySessionScheduleSchema = new mongoose.Schema(
     }],
     status: {
       type: String,
-      enum: ['scheduled', 'in_progress', 'completed', 'skipped', 'rescheduled'],
+      enum: ['scheduled', 'completed', 'missed'],
       default: 'scheduled',
       index: true
     },
@@ -171,7 +171,6 @@ studySessionScheduleSchema.methods.complete = function(focusLevel, notes, comple
 
 // Method to reschedule session
 studySessionScheduleSchema.methods.reschedule = function(newDate, newStartTime, newEndTime) {
-  this.status = 'rescheduled';
   this.isUserEdited = true;
   this.editHistory.push({
     editedAt: new Date(),
@@ -184,5 +183,43 @@ studySessionScheduleSchema.methods.reschedule = function(newDate, newStartTime, 
   this.endTime = newEndTime;
   return this.save();
 };
+
+// Method to get computed status (auto-detect missed)
+studySessionScheduleSchema.methods.getComputedStatus = function() {
+  // If already completed or missed, return as is
+  if (this.status === 'completed' || this.status === 'missed') {
+    return this.status;
+  }
+  
+  // Check if session time has passed (Vietnam timezone UTC+7)
+  const now = new Date();
+  const vietnamTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+  
+  const sessionDate = new Date(this.date);
+  const [endHour, endMinute] = this.endTime.split(':').map(Number);
+  sessionDate.setHours(endHour, endMinute, 0, 0);
+  
+  // If current time is past session end time and status is still scheduled, return missed
+  if (vietnamTime > sessionDate && this.status === 'scheduled') {
+    return 'missed';
+  }
+  
+  return this.status;
+};
+
+// Transform output to include computed status
+studySessionScheduleSchema.set('toJSON', {
+  transform: function(doc, ret) {
+    ret.status = doc.getComputedStatus();
+    return ret;
+  }
+});
+
+studySessionScheduleSchema.set('toObject', {
+  transform: function(doc, ret) {
+    ret.status = doc.getComputedStatus();
+    return ret;
+  }
+});
 
 module.exports = mongoose.model('StudySessionSchedule', studySessionScheduleSchema);

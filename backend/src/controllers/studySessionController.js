@@ -422,3 +422,89 @@ exports.getStudyStats = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// Get weekly schedule
+exports.getWeeklySchedule = async (req, res) => {
+  try {
+    const { offset } = req.query;
+    const userId = req.user._id;
+    const weekOffset = parseInt(offset) || 0;
+
+    console.log('📅 Fetching weekly schedule for user:', userId, 'Offset:', weekOffset);
+
+    // Calculate week date range based on current week + offset
+    const today = new Date();
+    const currentDayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    
+    // Get current Monday
+    const currentMonday = new Date(today);
+    const daysToMonday = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek;
+    currentMonday.setDate(today.getDate() + daysToMonday);
+    currentMonday.setHours(0, 0, 0, 0);
+    
+    // Calculate current week number
+    const startOfYear = new Date(currentMonday.getFullYear(), 0, 1);
+    const daysSinceStartOfYear = Math.floor((currentMonday - startOfYear) / (24 * 60 * 60 * 1000));
+    const currentWeekNumber = Math.ceil((daysSinceStartOfYear + 1) / 7);
+    
+    // Apply offset to get requested week
+    const weekStart = new Date(currentMonday);
+    weekStart.setDate(currentMonday.getDate() + (weekOffset * 7));
+    
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6); // Monday to Sunday (7 days total)
+    weekEnd.setHours(23, 59, 59, 999);
+
+    const weekNumber = currentWeekNumber + weekOffset;
+
+    console.log('📅 Current week:', currentWeekNumber, '| Requested week:', weekNumber);
+    console.log('📅 Week range:', weekStart.toDateString(), '-', weekEnd.toDateString());
+
+    // Find sessions in this week
+    const sessions = await StudySessionSchedule.find({
+      userId,
+      date: {
+        $gte: weekStart,
+        $lte: weekEnd
+      }
+    })
+    .populate('subjectId', 'subjectName color subjectCode')
+    .sort({ date: 1, startTime: 1 })
+    .lean();
+
+    // Map sessions to include day of week and time slot
+    const mappedSessions = sessions.map(session => {
+      const sessionDate = new Date(session.date);
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const dayOfWeek = dayNames[sessionDate.getDay()];
+      
+      // Determine time slot based on start time
+      let timeSlot = 'Mor';
+      if (session.startTime) {
+        const hour = parseInt(session.startTime.split(':')[0]);
+        if (hour >= 12 && hour < 17) {
+          timeSlot = 'Aft';
+        } else if (hour >= 17) {
+          timeSlot = 'Eve';
+        }
+      }
+
+      return {
+        ...session,
+        dayOfWeek,
+        timeSlot,
+        subjectInfo: session.subjectId
+      };
+    });
+
+    console.log(`✅ Found ${mappedSessions.length} sessions for week ${weekNumber}`);
+
+    res.json({
+      weekNumber,
+      sessions: mappedSessions
+    });
+  } catch (error) {
+    console.error('❌ Error fetching weekly schedule:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
