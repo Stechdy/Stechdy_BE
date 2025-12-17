@@ -19,11 +19,15 @@ exports.createMoodEntry = async (req, res) => {
       });
     }
 
-    // Check if mood entry already exists for today
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+    // Check if mood entry already exists for today (Vietnam timezone)
+    const now = new Date();
+    const vietnamOffset = 7 * 60; // UTC+7
+    const localTime = new Date(now.getTime() + vietnamOffset * 60 * 1000);
+    
+    const startOfDay = new Date(localTime);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    const endOfDay = new Date(localTime);
+    endOfDay.setUTCHours(23, 59, 59, 999);
 
     const existingMood = await MoodTracking.findOne({
       userId,
@@ -45,14 +49,14 @@ exports.createMoodEntry = async (req, res) => {
       });
     }
 
-    // Create new mood entry
+    // Create new mood entry with Vietnam timezone
     const moodEntry = await MoodTracking.create({
       userId,
       mood,
       emotionTags: emotionTags || [],
       note: note || '',
       energyLevel: energyLevel || 5,
-      date: new Date()
+      date: localTime
     });
 
     // Update Gamification: Add XP for mood check-in
@@ -153,10 +157,15 @@ exports.getTodayMood = async (req, res) => {
   try {
     const userId = req.user._id;
     
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+    // Vietnam timezone (UTC+7)
+    const now = new Date();
+    const vietnamOffset = 7 * 60;
+    const localTime = new Date(now.getTime() + vietnamOffset * 60 * 1000);
+    
+    const startOfDay = new Date(localTime);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    const endOfDay = new Date(localTime);
+    endOfDay.setUTCHours(23, 59, 59, 999);
 
     const todayMood = await MoodTracking.findOne({
       userId,
@@ -186,11 +195,15 @@ exports.getMoodByDate = async (req, res) => {
     const userId = req.user._id;
     const { date } = req.params;
 
+    // Parse date and adjust for Vietnam timezone
     const targetDate = new Date(date);
-    const startOfDay = new Date(targetDate);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(targetDate);
-    endOfDay.setHours(23, 59, 59, 999);
+    const vietnamOffset = 7 * 60;
+    const localTime = new Date(targetDate.getTime() + vietnamOffset * 60 * 1000);
+    
+    const startOfDay = new Date(localTime);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    const endOfDay = new Date(localTime);
+    endOfDay.setUTCHours(23, 59, 59, 999);
 
     const moodEntry = await MoodTracking.findOne({
       userId,
