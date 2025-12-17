@@ -2,12 +2,16 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/database');
+const { initializeScheduler } = require('./utils/scheduler');
 
 // Load env vars
 dotenv.config();
 
 // Connect to database
 connectDB();
+
+// Initialize scheduler for notifications
+initializeScheduler();
 
 const app = express();
 
@@ -21,6 +25,8 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/study-sessions', require('./routes/studySessionRoutes'));
+app.use('/api/moods', require('./routes/moodRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 // Welcome route
 app.get('/', (req, res) => {

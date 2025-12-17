@@ -27,6 +27,12 @@ const moodTrackingSchema = new mongoose.Schema({
     type: String,
     trim: true,
     maxlength: [500, 'Note must not exceed 500 characters']
+  },
+  energyLevel: {
+    type: Number,
+    min: [1, 'Energy level must be between 1 and 10'],
+    max: [10, 'Energy level must be between 1 and 10'],
+    default: 5
   }
 }, {
   timestamps: true
