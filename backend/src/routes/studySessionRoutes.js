@@ -6,6 +6,9 @@ const { protect } = require('../middleware/auth');
 // All routes require authentication
 router.use(protect);
 
+// Get active session (currently studying)
+router.get('/active', studySessionController.getActiveSession);
+
 // Get upcoming sessions by subject (for dashboard)
 router.get('/upcoming-by-subject', studySessionController.getUpcomingSessionsBySubject);
 
@@ -32,6 +35,15 @@ router.put('/:id', studySessionController.updateStudySession);
 
 // Complete a study session
 router.post('/:id/complete', studySessionController.completeStudySession);
+
+// Pause a study session
+router.post('/:id/pause', studySessionController.pauseSession);
+
+// Resume a study session
+router.post('/:id/resume', studySessionController.resumeSession);
+
+// End a study session manually
+router.post('/:id/end', studySessionController.endSession);
 
 // Reschedule a study session
 router.post('/:id/reschedule', studySessionController.rescheduleStudySession);

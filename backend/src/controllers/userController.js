@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Streak = require('../models/Streak');
 const jwt = require('jsonwebtoken');
 
 // Generate JWT Token
@@ -149,6 +150,9 @@ exports.getUserStreak = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    // Get streak data from Streak model
+    const streak = await Streak.findOne({ userId: req.user._id });
+
     // Calculate total study hours from completed sessions
     const completedSessions = await StudySessionSchedule.find({
       userId: req.user._id,
@@ -160,10 +164,33 @@ exports.getUserStreak = async (req, res) => {
     }, 0);
     const totalHours = Math.floor(totalMinutes / 60);
 
-    // Get calendar data (days with study sessions in current month)
+    // Get streak history - days user has logged in
+    let streakDays = [];
+    if (streak && streak.streakHistory) {
+      streakDays = streak.streakHistory.map(item => {
+        const date = new Date(item.date);
+        return {
+          day: date.getDate(),
+          month: date.getMonth() + 1,
+          year: date.getFullYear(),
+          fullDate: date.toISOString().split('T')[0]
+        };
+      });
+    }
+
+    // Get calendar data - combine streak history and completed sessions
     const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Get all days this month with login activity
+    const loginDaysThisMonth = streakDays
+      .filter(d => d.month === currentMonth + 1 && d.year === currentYear)
+      .map(d => d.day);
+
+    // Get all days this month with completed sessions
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+    const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
 
     const sessionsThisMonth = await StudySessionSchedule.find({
       userId: req.user._id,
@@ -174,17 +201,23 @@ exports.getUserStreak = async (req, res) => {
       status: 'completed'
     });
 
-    // Extract unique days that have sessions
-    const activeDays = [...new Set(
+    const sessionDaysThisMonth = [...new Set(
       sessionsThisMonth.map(session => new Date(session.date).getDate())
     )];
 
-    console.log(`✅ Streak: ${user.streakCount} days, Total hours: ${totalHours}h, Active days: ${activeDays.length}`);
+    // Combine login days and session days (unique)
+    const activeDays = [...new Set([...loginDaysThisMonth, ...sessionDaysThisMonth])].sort((a, b) => a - b);
+
+    console.log(`✅ Streak: ${streak?.currentStreak || user.streakCount} days, Total hours: ${totalHours}h, Active days: ${activeDays.length}`);
 
     res.json({
-      currentStreak: user.streakCount || 0,
+      currentStreak: streak?.currentStreak || user.streakCount || 0,
+      longestStreak: streak?.longestStreak || 0,
+      totalActiveDays: streak?.totalActiveDays || 0,
       totalHours,
-      calendar: activeDays.sort((a, b) => a - b)
+      calendar: activeDays,
+      streakHistory: streakDays,
+      lastActiveDate: streak?.lastActiveDate || null
     });
   } catch (error) {
     console.error('❌ Error fetching streak data:', error);

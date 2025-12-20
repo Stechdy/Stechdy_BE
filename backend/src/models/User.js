@@ -219,13 +219,6 @@ userSchema.virtual('moodHistory', {
   foreignField: 'userId'
 });
 
-// Virtual for study stats
-userSchema.virtual('studyStats', {
-  ref: 'StudyTracker',
-  localField: '_id',
-  foreignField: 'userId'
-});
-
 // Virtual for account lock status
 userSchema.virtual('isLocked').get(function() {
   return !!(this.lockUntil && this.lockUntil > Date.now());

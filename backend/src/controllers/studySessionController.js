@@ -423,6 +423,223 @@ exports.getStudyStats = async (req, res) => {
   }
 };
 
+// Get active study session (the one user is currently studying)
+exports.getActiveSession = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const now = new Date();
+    
+    // Tìm session đang học (đã confirm, có actualStartTime, chưa kết thúc)
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const activeSession = await StudySessionSchedule.findOne({
+      userId,
+      date: { $gte: today, $lt: tomorrow },
+      actualStartTime: { $exists: true, $ne: null },
+      actualEndTime: { $exists: false },
+      status: { $ne: 'completed' }
+    })
+    .populate('subjectId', 'subjectName color subjectCode')
+    .lean();
+    
+    if (!activeSession) {
+      return res.json(null);
+    }
+    
+    // Tính toán thời gian đã học và còn lại
+    const actualStartTime = new Date(activeSession.actualStartTime);
+    const pausedDuration = activeSession.pausedDuration || 0; // Phút đã pause
+    
+    // Parse endTime từ schema (format: "HH:MM")
+    const [endHour, endMinute] = activeSession.endTime.split(':').map(Number);
+    const plannedEndTime = new Date(activeSession.date);
+    plannedEndTime.setHours(endHour, endMinute, 0, 0);
+    
+    // Thời gian đã học thực tế (trừ đi thời gian pause)
+    const elapsedMs = now - actualStartTime - (pausedDuration * 60 * 1000);
+    const elapsedMinutes = Math.max(0, Math.floor(elapsedMs / (1000 * 60)));
+    
+    // Thời gian còn lại
+    const remainingMs = plannedEndTime - now;
+    const remainingMinutes = Math.max(0, Math.floor(remainingMs / (1000 * 60)));
+    
+    // Tổng thời gian dự kiến
+    const [startHour, startMinute] = activeSession.startTime.split(':').map(Number);
+    const plannedStartTime = new Date(activeSession.date);
+    plannedStartTime.setHours(startHour, startMinute, 0, 0);
+    const totalPlannedMinutes = (plannedEndTime - plannedStartTime) / (1000 * 60);
+    
+    res.json({
+      ...activeSession,
+      elapsedMinutes,
+      remainingMinutes,
+      totalPlannedMinutes,
+      isPaused: activeSession.isPaused || false,
+      pausedDuration: pausedDuration
+    });
+  } catch (error) {
+    console.error('❌ Error fetching active session:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Pause active study session
+exports.pauseSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+    
+    const session = await StudySessionSchedule.findOne({ _id: id, userId });
+    
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+    
+    if (!session.actualStartTime) {
+      return res.status(400).json({ message: 'Session has not started yet' });
+    }
+    
+    // Đánh dấu đang pause
+    session.isPaused = true;
+    session.pausedAt = new Date();
+    await session.save();
+    
+    console.log(`⏸️ Session ${id} paused`);
+    
+    res.json({ success: true, message: 'Session paused', session });
+  } catch (error) {
+    console.error('❌ Error pausing session:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Resume paused study session
+exports.resumeSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+    
+    const session = await StudySessionSchedule.findOne({ _id: id, userId });
+    
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+    
+    if (!session.isPaused) {
+      return res.status(400).json({ message: 'Session is not paused' });
+    }
+    
+    // Tính thời gian đã pause và cộng vào pausedDuration
+    const pausedAt = session.pausedAt ? new Date(session.pausedAt) : new Date();
+    const now = new Date();
+    const pausedMs = now - pausedAt;
+    const pausedMinutes = Math.floor(pausedMs / (1000 * 60));
+    
+    session.isPaused = false;
+    session.pausedAt = null;
+    session.pausedDuration = (session.pausedDuration || 0) + pausedMinutes;
+    await session.save();
+    
+    console.log(`▶️ Session ${id} resumed after ${pausedMinutes} minutes`);
+    
+    res.json({ success: true, message: 'Session resumed', session });
+  } catch (error) {
+    console.error('❌ Error resuming session:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// End study session manually
+exports.endSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+    const { focusLevel, completionNotes, completedTopics } = req.body;
+    
+    const session = await StudySessionSchedule.findOne({ _id: id, userId })
+      .populate('subjectId', 'subjectName color');
+    
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+    
+    if (!session.actualStartTime) {
+      return res.status(400).json({ message: 'Session has not started yet' });
+    }
+    
+    // Tính thời gian học thực tế từ startTime (không phải từ actualStartTime)
+    const [startHour, startMinute] = session.startTime.split(':').map(Number);
+    const plannedStartTime = new Date(session.date);
+    plannedStartTime.setHours(startHour, startMinute, 0, 0);
+    
+    const now = new Date();
+    const pausedDuration = session.pausedDuration || 0;
+    
+    // Nếu đang pause, cộng thêm thời gian pause hiện tại
+    let totalPausedMinutes = pausedDuration;
+    if (session.isPaused && session.pausedAt) {
+      const currentPausedMs = now - new Date(session.pausedAt);
+      totalPausedMinutes += Math.floor(currentPausedMs / (1000 * 60));
+    }
+    
+    // Tính duration từ startTime (không phải actualStartTime)
+    const totalMs = now - plannedStartTime;
+    const actualDuration = Math.max(0, Math.floor(totalMs / (1000 * 60)) - totalPausedMinutes);
+    
+    // Cập nhật session
+    session.actualEndTime = now;
+    session.actualDuration = actualDuration;
+    session.status = 'completed';
+    session.isPaused = false;
+    session.pausedAt = null;
+    session.focusLevel = focusLevel || 3;
+    session.completionNotes = completionNotes || '';
+    session.completedTopics = completedTopics || [];
+    session.wasProductived = actualDuration >= 30; // Productive nếu học >= 30 phút
+    
+    await session.save();
+    
+    console.log(`✅ Session ${id} completed. Duration: ${actualDuration} minutes`);
+    
+    // Gửi email chúc mừng (nếu có emailService)
+    try {
+      const { sendCompletionEmail } = require('../services/emailService');
+      const user = await require('../models/User').findById(userId);
+      
+      if (user && user.email && sendCompletionEmail) {
+        await sendCompletionEmail(user.email, {
+          userName: user.name,
+          subjectName: session.subjectId?.subjectName || 'Study Session',
+          actualDuration,
+          startTime: session.startTime,
+          endTime: session.endTime,
+          focusLevel
+        });
+      }
+    } catch (emailError) {
+      console.error('❌ Error sending completion email:', emailError);
+      // Không throw error, chỉ log
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Session completed', 
+      session,
+      stats: {
+        actualDuration,
+        pausedDuration: totalPausedMinutes,
+        focusLevel
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error ending session:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 // Get weekly schedule
 exports.getWeeklySchedule = async (req, res) => {
   try {

@@ -115,13 +115,6 @@ subjectSchema.virtual('deadlines', {
   foreignField: 'subjectId'
 });
 
-// Virtual for study sessions
-subjectSchema.virtual('studySessions', {
-  ref: 'StudySession',
-  localField: '_id',
-  foreignField: 'subjectId'
-});
-
 // Method to calculate progress
 subjectSchema.methods.updateProgress = function() {
   if (this.syllabusStructure && this.syllabusStructure.length > 0) {

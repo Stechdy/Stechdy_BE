@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Streak = require('../models/Streak');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
@@ -33,6 +34,86 @@ const createTransporter = () => {
   });
 };
 
+// Helper function to get Vietnam time (UTC+7)
+// Note: Server runs with TZ=Asia/Ho_Chi_Minh, so new Date() is already Vietnam time
+const getVietnamDate = () => {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return now;
+};
+
+// Update user streak on login
+const updateUserStreak = async (userId) => {
+  try {
+    const today = getVietnamDate();
+    
+    // Find or create streak record for user
+    let streak = await Streak.findOne({ userId });
+    
+    if (!streak) {
+      // Create new streak record
+      streak = await Streak.create({
+        userId,
+        lastActiveDate: today,
+        currentStreak: 1,
+        longestStreak: 1,
+        totalActiveDays: 1,
+        streakHistory: [{ date: today, activityCount: 1 }]
+      });
+      
+      console.log(`🔥 New streak created for user ${userId}: 1 day`);
+      return streak;
+    }
+    
+    // Get last active date normalized to start of day
+    const lastActive = new Date(streak.lastActiveDate);
+    lastActive.setHours(0, 0, 0, 0);
+    
+    // Calculate days difference
+    const daysDiff = Math.floor((today - lastActive) / (1000 * 60 * 60 * 24));
+    
+    console.log(`📅 Streak check - Today: ${today.toDateString()}, Last Active: ${lastActive.toDateString()}, Days Diff: ${daysDiff}`);
+    
+    if (daysDiff === 0) {
+      // Same day - already checked in today, don't update streak
+      console.log(`✅ Already checked in today. Current streak: ${streak.currentStreak}`);
+      return streak;
+    } else if (daysDiff === 1) {
+      // Consecutive day - increment streak
+      streak.currentStreak += 1;
+      streak.totalActiveDays += 1;
+      
+      if (streak.currentStreak > streak.longestStreak) {
+        streak.longestStreak = streak.currentStreak;
+      }
+      
+      // Add today to streak history
+      streak.streakHistory.push({ date: today, activityCount: 1 });
+      
+      console.log(`🔥 Streak continued! New streak: ${streak.currentStreak} days`);
+    } else {
+      // Streak broken (more than 1 day gap) - reset to 1
+      streak.currentStreak = 1;
+      streak.totalActiveDays += 1;
+      
+      // Add today to streak history
+      streak.streakHistory.push({ date: today, activityCount: 1 });
+      
+      console.log(`💔 Streak broken! Reset to 1 day`);
+    }
+    
+    // Update last active date
+    streak.lastActiveDate = today;
+    await streak.save();
+    
+    return streak;
+  } catch (error) {
+    console.error('Error updating streak:', error);
+    // Return a default streak object if error
+    return { currentStreak: 0, longestStreak: 0, totalActiveDays: 0, streakHistory: [] };
+  }
+};
+
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -65,14 +146,18 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Create user
+    // Create user with default streakCount = 1
     const user = await User.create({
       name,
       email,
       passwordHash: password,
+      streakCount: 1,
     });
 
     if (user) {
+      // Create initial streak record for new user
+      const streakData = await updateUserStreak(user._id);
+
       res.status(201).json({
         success: true,
         message: 'Đăng ký thành công',
@@ -82,6 +167,7 @@ exports.register = async (req, res) => {
           email: user.email,
           role: user.role,
           avatarUrl: user.avatarUrl,
+          streakCount: streakData.currentStreak,
           token: generateToken(user._id),
         },
       });
@@ -151,6 +237,11 @@ exports.login = async (req, res) => {
     // Reset login attempts on successful login
     await user.resetLoginAttempts();
 
+    // Update streak on login
+    const streakData = await updateUserStreak(user._id);
+    user.streakCount = streakData.currentStreak;
+    await user.save();
+
     res.json({
       success: true,
       message: 'Đăng nhập thành công',
@@ -163,7 +254,7 @@ exports.login = async (req, res) => {
         premiumStatus: user.premiumStatus,
         level: user.level,
         xp: user.xp,
-        streakCount: user.streakCount,
+        streakCount: streakData.currentStreak,
         token: generateToken(user._id),
       },
     });
@@ -527,11 +618,17 @@ exports.googleLogin = async (req, res) => {
         avatarUrl: picture || null,
         isVerified: true,
         lastLogin: Date.now(),
+        streakCount: 1, // Default streak for new users
       });
     }
 
     // Generate token
     const token = generateToken(user._id);
+
+    // Update streak on Google login
+    const streakData = await updateUserStreak(user._id);
+    user.streakCount = streakData.currentStreak;
+    await user.save();
 
     res.status(200).json({
       success: true,
@@ -544,6 +641,7 @@ exports.googleLogin = async (req, res) => {
         avatarUrl: user.avatarUrl,
         premiumStatus: user.premiumStatus,
         authProvider: user.authProvider,
+        streakCount: streakData.currentStreak,
         token,
       },
     });

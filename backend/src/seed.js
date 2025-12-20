@@ -5,8 +5,6 @@ require('dotenv').config();
 const {
   User,
   Task,
-  StudySession,
-  StudyTracker,
   SmartNote,
   AIStudyBuddy,
   MoodTracking,
@@ -103,8 +101,6 @@ async function seedDatabase() {
     console.log('🗑️  Clearing existing data...');
     await User.deleteMany({});
     await Task.deleteMany({});
-    await StudySession.deleteMany({});
-    await StudyTracker.deleteMany({});
     await SmartNote.deleteMany({});
     await AIStudyBuddy.deleteMany({});
     await MoodTracking.deleteMany({});
@@ -287,6 +283,35 @@ async function seedDatabase() {
           sounds: true,
           privacy: 'private'
         }
+      },
+      {
+        name: 'Tai Nguyen',
+        email: 'tai05112004@gmail.com',
+        passwordHash: plainPassword,
+        avatarUrl: 'https://i.pravatar.cc/150?img=68',
+        premiumStatus: 'premium',
+        isVerified: true,
+        authProvider: 'local',
+        joinedAt: getDaysAgo(30),
+        lastLogin: getDaysAgo(0),
+        level: 6,
+        xp: 520,
+        streakCount: 15,
+        bio: 'Computer Science student passionate about coding',
+        phone: '+84912345678',
+        timezone: 'Asia/Ho_Chi_Minh',
+        notificationSettings: {
+          dailyEmail: true,
+          studyReminder: true,
+          deadlineReminder: true,
+          weeklyReport: true,
+          aiSuggestions: true
+        },
+        settings: {
+          notification: true,
+          sounds: true,
+          privacy: 'private'
+        }
       }
     ]);
     console.log(`✅ Created ${users.length} users`);
@@ -340,82 +365,6 @@ async function seedDatabase() {
       }
     }
     console.log(`✅ Created ${tasks.length} tasks`);
-
-    // Create Study Sessions (10 sessions)
-    console.log('📚 Creating study sessions...');
-    const studySessions = [];
-    for (const user of users) {
-      for (let i = 0; i < 2; i++) {
-        const dayOffset = Math.floor(Math.random() * 14) + 1;
-        const baseDate = getDaysAgo(dayOffset);
-        const startTime = getRandomTimeOfDay(baseDate, 8, 20);
-        const duration = 30 + Math.floor(Math.random() * 90); // 30-120 minutes
-        const endTime = new Date(startTime.getTime() + duration * 60000);
-        
-        const userTasks = tasks.filter(t => t.userId.toString() === user._id.toString());
-        const linkedTask = Math.random() > 0.5 && userTasks.length > 0 
-          ? userTasks[Math.floor(Math.random() * userTasks.length)]._id 
-          : null;
-
-        const session = await StudySession.create({
-          userId: user._id,
-          taskId: linkedTask,
-          startTime: startTime,
-          endTime: endTime,
-          duration: duration,
-          subject: subjects[Math.floor(Math.random() * subjects.length)],
-          focusLevel: Math.floor(Math.random() * 3) + 3 // 3-5
-        });
-        studySessions.push(session);
-      }
-    }
-    console.log(`✅ Created ${studySessions.length} study sessions`);
-
-    // Create Study Trackers
-    console.log('📊 Creating study trackers...');
-    const studyTrackers = [];
-    for (const user of users) {
-      const userSessions = studySessions.filter(s => s.userId.toString() === user._id.toString());
-      
-      // Group sessions by date
-      const sessionsByDate = {};
-      userSessions.forEach(session => {
-        const dateKey = session.startTime.toISOString().split('T')[0];
-        if (!sessionsByDate[dateKey]) {
-          sessionsByDate[dateKey] = [];
-        }
-        sessionsByDate[dateKey].push(session);
-      });
-
-      // Create tracker for each date
-      for (const [dateStr, sessions] of Object.entries(sessionsByDate)) {
-        const totalMinutes = sessions.reduce((sum, s) => sum + s.duration, 0);
-        
-        // Calculate subject breakdown
-        const subjectMap = {};
-        sessions.forEach(s => {
-          if (!subjectMap[s.subject]) {
-            subjectMap[s.subject] = 0;
-          }
-          subjectMap[s.subject] += s.duration;
-        });
-        
-        const subjectBreakdown = Object.entries(subjectMap).map(([subject, minutes]) => ({
-          subject,
-          minutes
-        }));
-
-        const tracker = await StudyTracker.create({
-          userId: user._id,
-          date: new Date(dateStr),
-          totalMinutes: totalMinutes,
-          sessions: sessions.map(s => s._id),
-          subjectBreakdown: subjectBreakdown
-        });
-        studyTrackers.push(tracker);
-      }
-    }
-    console.log(`✅ Created ${studyTrackers.length} study trackers`);
 
     // Create Smart Notes
     console.log('📓 Creating smart notes...');
@@ -998,9 +947,7 @@ async function seedDatabase() {
     console.log('=================================');
     console.log(`👥 Users: ${users.length} (${users.filter(u => u.role === 'admin').length} admin, ${users.filter(u => u.role === 'moderator').length} moderator)`);
     console.log(`📝 Tasks: ${tasks.length}`);
-    console.log(`📚 Study Sessions: ${studySessions.length}`);
-    console.log(`📊 Study Trackers: ${studyTrackers.length}`);
-    console.log(`📓 Smart Notes: ${smartNotes.length}`);
+    console.log(` Smart Notes: ${smartNotes.length}`);
     console.log(`🤖 AI Study Buddies: ${aiStudyBuddies.length}`);
     console.log(`😊 Mood Trackings: ${moodTrackings.length}`);
     console.log(`🧠 AI Mood Insights: ${aiMoodInsights.length}`);
@@ -1675,6 +1622,203 @@ async function seedDatabase() {
       }
     ]);
     console.log(`✅ Created ${notificationLogs.length} notification logs`);
+
+    // ============================================================
+    // TAI USER - STUDY SCHEDULE DATA
+    // ============================================================
+    
+    const taiUser = users.find(u => u.email === 'tai05112004@gmail.com');
+    
+    console.log('📅 Creating Tai User Semester...');
+    const taiSemester = await Semester.create({
+      userId: taiUser._id,
+      name: 'Fall 2025',
+      startDate: new Date('2025-09-01'),
+      endDate: new Date('2025-12-31'),
+      isActive: true,
+      academicYear: '2025-2026',
+      term: 'Fall',
+      totalCredits: 20,
+      notes: 'Computer Science major - Final semester'
+    });
+    console.log(`✅ Created semester for Tai`);
+
+    console.log('📚 Creating Tai User Subjects...');
+    const taiSubjects = await Subject.create([
+      {
+        userId: taiUser._id,
+        semesterId: taiSemester._id,
+        subjectName: 'Advanced Web Development',
+        subjectCode: 'CS401',
+        credits: 4,
+        instructor: 'Prof. Nguyen Van A',
+        color: '#FF6B6B',
+        syllabus: 'Full-stack development with React, Node.js, and MongoDB',
+        syllabusStructure: [
+          { topic: 'React Fundamentals', estimatedHours: 10, isCompleted: true, completedAt: getDaysAgo(60) },
+          { topic: 'State Management', estimatedHours: 8, isCompleted: true, completedAt: getDaysAgo(50) },
+          { topic: 'Backend APIs', estimatedHours: 12, isCompleted: true, completedAt: getDaysAgo(30) },
+          { topic: 'Database Design', estimatedHours: 10, isCompleted: false },
+          { topic: 'Authentication & Security', estimatedHours: 8, isCompleted: false },
+          { topic: 'Deployment', estimatedHours: 6, isCompleted: false }
+        ],
+        priorityLevel: 'critical',
+        difficultyLevel: 'hard',
+        estimatedWeeklyHours: 10,
+        progress: 55,
+        notes: 'Capstone project course'
+      },
+      {
+        userId: taiUser._id,
+        semesterId: taiSemester._id,
+        subjectName: 'Machine Learning',
+        subjectCode: 'CS402',
+        credits: 4,
+        instructor: 'Dr. Tran Thi B',
+        color: '#4ECDC4',
+        syllabus: 'Introduction to ML algorithms, neural networks, and deep learning',
+        syllabusStructure: [
+          { topic: 'Linear Regression', estimatedHours: 6, isCompleted: true, completedAt: getDaysAgo(55) },
+          { topic: 'Classification Algorithms', estimatedHours: 8, isCompleted: true, completedAt: getDaysAgo(40) },
+          { topic: 'Neural Networks', estimatedHours: 10, isCompleted: false },
+          { topic: 'Deep Learning', estimatedHours: 12, isCompleted: false }
+        ],
+        priorityLevel: 'high',
+        difficultyLevel: 'hard',
+        estimatedWeeklyHours: 8,
+        progress: 40,
+        notes: 'Exciting but challenging'
+      },
+      {
+        userId: taiUser._id,
+        semesterId: taiSemester._id,
+        subjectName: 'Software Engineering',
+        subjectCode: 'CS403',
+        credits: 3,
+        instructor: 'Prof. Le Van C',
+        color: '#95E1D3',
+        syllabus: 'Software development lifecycle, testing, and project management',
+        syllabusStructure: [
+          { topic: 'Requirements Analysis', estimatedHours: 6, isCompleted: true, completedAt: getDaysAgo(50) },
+          { topic: 'Design Patterns', estimatedHours: 8, isCompleted: true, completedAt: getDaysAgo(35) },
+          { topic: 'Testing Strategies', estimatedHours: 6, isCompleted: false },
+          { topic: 'Agile & DevOps', estimatedHours: 8, isCompleted: false }
+        ],
+        priorityLevel: 'medium',
+        difficultyLevel: 'medium',
+        estimatedWeeklyHours: 6,
+        progress: 50,
+        notes: 'Important for career'
+      },
+      {
+        userId: taiUser._id,
+        semesterId: taiSemester._id,
+        subjectName: 'Mobile App Development',
+        subjectCode: 'CS404',
+        credits: 3,
+        instructor: 'Dr. Pham Thi D',
+        color: '#FFE66D',
+        syllabus: 'React Native and mobile development best practices',
+        syllabusStructure: [
+          { topic: 'React Native Basics', estimatedHours: 8, isCompleted: true, completedAt: getDaysAgo(45) },
+          { topic: 'Navigation & Routing', estimatedHours: 6, isCompleted: false },
+          { topic: 'Native Modules', estimatedHours: 8, isCompleted: false },
+          { topic: 'App Deployment', estimatedHours: 6, isCompleted: false }
+        ],
+        priorityLevel: 'medium',
+        difficultyLevel: 'medium',
+        estimatedWeeklyHours: 6,
+        progress: 30,
+        notes: 'Building a personal project'
+      },
+      {
+        userId: taiUser._id,
+        semesterId: taiSemester._id,
+        subjectName: 'Computer Networks',
+        subjectCode: 'CS405',
+        credits: 3,
+        instructor: 'Prof. Hoang Van E',
+        color: '#A8E6CF',
+        syllabus: 'Network protocols, architecture, and security',
+        syllabusStructure: [
+          { topic: 'OSI Model', estimatedHours: 6, isCompleted: true, completedAt: getDaysAgo(48) },
+          { topic: 'TCP/IP', estimatedHours: 8, isCompleted: true, completedAt: getDaysAgo(30) },
+          { topic: 'Routing Protocols', estimatedHours: 8, isCompleted: false },
+          { topic: 'Network Security', estimatedHours: 6, isCompleted: false }
+        ],
+        priorityLevel: 'medium',
+        difficultyLevel: 'medium',
+        estimatedWeeklyHours: 5,
+        progress: 45,
+        notes: 'Interesting but lots of theory'
+      }
+    ]);
+    console.log(`✅ Created ${taiSubjects.length} subjects for Tai`);
+
+    console.log('🗓️ Creating Tai User Study Timetable...');
+    const taiTimetable = await StudyTimetable.create({
+      userId: taiUser._id,
+      semesterId: taiSemester._id,
+      weekStartDate: new Date('2025-12-15'),
+      weekEndDate: new Date('2025-12-21'),
+      generatedBy: 'manual',
+      status: 'active',
+      version: 1,
+      totalStudyHours: 35
+    });
+
+    // Create Tai's study sessions
+    const taiStudySessions = [];
+    
+    const taiSessionsToCreate = [
+      // Monday Dec 16
+      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'morning', subjectId: taiSubjects[0]._id, startTime: '06:30', endTime: '08:00', topic: 'Web Dev Project - Authentication', objectives: ['Implement JWT auth', 'Add login/register pages'], focusLevel: 4 },
+      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'afternoon', subjectId: taiSubjects[1]._id, startTime: '14:00', endTime: '16:00', topic: 'ML Assignment - Neural Networks', objectives: ['Build simple neural network', 'Train on MNIST dataset'], focusLevel: 5 },
+      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'evening', subjectId: taiSubjects[2]._id, startTime: '19:00', endTime: '21:00', topic: 'Software Engineering - Testing', objectives: ['Write unit tests', 'Learn Jest framework'], focusLevel: 4 },
+      // Tuesday Dec 17
+      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'morning', subjectId: taiSubjects[3]._id, startTime: '06:30', endTime: '08:00', topic: 'Mobile App - Navigation Setup', objectives: ['Configure React Navigation', 'Build screen structure'], focusLevel: 5 },
+      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'afternoon', subjectId: taiSubjects[4]._id, startTime: '14:00', endTime: '15:30', topic: 'Networks - Routing Protocols', objectives: ['Study RIP and OSPF', 'Practice routing tables'], focusLevel: 4 },
+      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'evening', subjectId: taiSubjects[0]._id, startTime: '19:00', endTime: '21:30', topic: 'Web Dev - Database Integration', objectives: ['Connect MongoDB', 'Create user schema'], focusLevel: 5 },
+      // Wednesday Dec 18
+      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'morning', subjectId: taiSubjects[1]._id, startTime: '06:30', endTime: '08:30', topic: 'ML - Deep Learning Theory', objectives: ['Study CNN architecture', 'Review backpropagation'], focusLevel: 5 },
+      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'afternoon', subjectId: taiSubjects[2]._id, startTime: '14:00', endTime: '16:00', topic: 'SE - Agile Methodology', objectives: ['Study Scrum framework', 'Prepare presentation'], focusLevel: 4 },
+      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'evening', subjectId: taiSubjects[3]._id, startTime: '19:00', endTime: '21:00', topic: 'Mobile App - Feature Development', objectives: ['Build profile screen', 'Add image picker'], focusLevel: 4 },
+      // Thursday Dec 19
+      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'morning', subjectId: taiSubjects[0]._id, startTime: '06:30', endTime: '08:30', topic: 'Web Dev - Frontend Polish', objectives: ['Improve UI/UX', 'Add animations'], focusLevel: 4 },
+      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'afternoon', subjectId: taiSubjects[4]._id, startTime: '14:00', endTime: '15:30', topic: 'Networks - Security Concepts', objectives: ['Study encryption methods', 'Review firewalls'], focusLevel: 5 },
+      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'evening', subjectId: taiSubjects[1]._id, startTime: '19:00', endTime: '21:30', topic: 'ML Project Work', objectives: ['Train final model', 'Optimize hyperparameters'], focusLevel: 5 },
+      // Friday Dec 20
+      { date: new Date('2025-12-20'), dayOfWeek: 5, sessionType: 'morning', subjectId: taiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'SE - Documentation', objectives: ['Write API docs', 'Create diagrams'], focusLevel: 3 },
+      { date: new Date('2025-12-20'), dayOfWeek: 5, sessionType: 'evening', subjectId: taiSubjects[3]._id, startTime: '19:00', endTime: '20:30', topic: 'Mobile App - Testing', objectives: ['Test all features', 'Fix bugs'], focusLevel: 4 },
+      // Saturday Dec 21
+      { date: new Date('2025-12-21'), dayOfWeek: 6, sessionType: 'morning', subjectId: taiSubjects[0]._id, startTime: '09:00', endTime: '11:00', topic: 'Web Dev - Final Review', objectives: ['Test deployment', 'Prepare demo'], focusLevel: 4 }
+    ];
+    
+    for (const sessionData of taiSessionsToCreate) {
+      const isCompleted = sessionData.date < now;
+      
+      const newSession = await StudySessionSchedule.create({
+        timetableId: taiTimetable._id,
+        userId: taiUser._id,
+        subjectId: sessionData.subjectId,
+        date: sessionData.date,
+        dayOfWeek: sessionData.dayOfWeek,
+        sessionType: sessionData.sessionType,
+        startTime: sessionData.startTime,
+        endTime: sessionData.endTime,
+        topic: sessionData.topic,
+        objectives: sessionData.objectives,
+        plannedDuration: 90,
+        isUserEdited: false,
+        status: isCompleted ? 'completed' : 'scheduled',
+        focusLevel: isCompleted ? sessionData.focusLevel : undefined,
+        wasProductived: isCompleted ? true : undefined,
+        completedAt: isCompleted ? sessionData.date : undefined
+      });
+      
+      taiStudySessions.push(newSession);
+    }
+    console.log(`✅ Created ${taiStudySessions.length} study sessions for Tai`);
 
     console.log('\n📊 AI SCHEDULING SYSTEM DATA SUMMARY:');
     console.log(`   Semesters: ${semesters.length}`);

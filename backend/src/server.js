@@ -1,8 +1,13 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+
+// Load env vars FIRST - includes TZ=Asia/Ho_Chi_Minh
+dotenv.config();
+
 const connectDB = require('./config/database');
 const { initializeScheduler } = require('./utils/scheduler');
+const { startReminderScheduler } = require('./services/sessionReminderService');
 
 // Load env vars
 dotenv.config();
@@ -12,6 +17,9 @@ connectDB();
 
 // Initialize scheduler for notifications
 initializeScheduler();
+
+// Start session reminder scheduler
+startReminderScheduler();
 
 const app = express();
 
@@ -28,6 +36,7 @@ app.use('/api/subjects', require('./routes/subjectRoutes'));
 app.use('/api/study-sessions', require('./routes/studySessionRoutes'));
 app.use('/api/moods', require('./routes/moodRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/session-reminder', require('./routes/sessionReminderRoutes'));
 
 // Welcome route
 app.get('/', (req, res) => {

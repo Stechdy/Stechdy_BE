@@ -115,7 +115,23 @@ const studySessionScheduleSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    reminderSentAt: Date
+    reminderSentAt: Date,
+    // Fields for tracking active session
+    confirmedAt: Date,
+    isPaused: {
+      type: Boolean,
+      default: false
+    },
+    pausedAt: Date,
+    pausedDuration: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    completionEmailSent: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true

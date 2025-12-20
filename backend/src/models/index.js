@@ -3,8 +3,6 @@ module.exports = {
   // Original models
   User: require('./User'),
   Task: require('./Task'),
-  StudySession: require('./StudySession'),
-  StudyTracker: require('./StudyTracker'),
   SmartNote: require('./SmartNote'),
   AIStudyBuddy: require('./AIStudyBuddy'),
   MoodTracking: require('./MoodTracking'),

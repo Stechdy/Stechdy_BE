@@ -70,7 +70,7 @@ const activityLogSchema = new mongoose.Schema({
   },
   targetType: {
     type: String,
-    enum: ['User', 'Task', 'StudySession', 'SmartNote', 'Subscription', 'Payment', null],
+    enum: ['User', 'Task', 'SmartNote', 'Subscription', 'Payment', null],
     default: null
   },
   status: {
