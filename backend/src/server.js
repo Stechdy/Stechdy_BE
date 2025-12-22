@@ -1,8 +1,10 @@
 const express = require('express');
+const http = require('http');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/database');
 const { initializeScheduler } = require('./utils/scheduler');
+const { initializeSocket } = require('./services/socketService');
 
 // Load env vars
 dotenv.config();
@@ -14,6 +16,7 @@ connectDB();
 initializeScheduler();
 
 const app = express();
+const server = http.createServer(app);
 
 // Middleware
 app.use(cors());
@@ -46,6 +49,9 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  
+  // Initialize Socket.IO after server starts
+  initializeSocket(server);
 });
