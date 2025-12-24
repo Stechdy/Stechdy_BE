@@ -47,14 +47,6 @@ const studySessionScheduleSchema = new mongoose.Schema(
       required: [true, 'End time is required'],
       match: [/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'End time must be in HH:MM format']
     },
-    topic: {
-      type: String,
-      trim: true
-    },
-    objectives: [{
-      type: String,
-      trim: true
-    }],
     resources: [{
       type: {
         type: String,
@@ -102,15 +94,6 @@ const studySessionScheduleSchema = new mongoose.Schema(
     completedTopics: [{
       type: String
     }],
-    difficulty: {
-      type: String,
-      enum: ['easy', 'medium', 'hard'],
-      default: 'medium'
-    },
-    wasProductived: {
-      type: Boolean,
-      default: null
-    },
     reminderSent: {
       type: Boolean,
       default: false
@@ -170,14 +153,16 @@ studySessionScheduleSchema.methods.getDurationMinutes = function() {
 };
 
 // Method to mark session as completed
-studySessionScheduleSchema.methods.complete = function(focusLevel, notes, completedTopics) {
+studySessionScheduleSchema.methods.complete = function(focusLevel, notes, completedTopics, actualDuration) {
   this.status = 'completed';
   this.actualEndTime = new Date();
   this.focusLevel = focusLevel || this.focusLevel;
   this.completionNotes = notes || this.completionNotes;
   this.completedTopics = completedTopics || this.completedTopics;
   
-  if (this.actualStartTime) {
+  if (actualDuration) {
+    this.actualDuration = actualDuration;
+  } else if (this.actualStartTime) {
     const duration = (this.actualEndTime - this.actualStartTime) / (1000 * 60);
     this.actualDuration = Math.round(duration);
   }

@@ -13,7 +13,9 @@ async function createTestSession() {
     console.log('✅ Connected to database');
 
     // Xóa test sessions cũ
-    const deleted = await StudySessionSchedule.deleteMany({ topic: 'TEST EMAIL REMINDER' });
+    const deleted = await StudySessionSchedule.deleteMany({ 
+      topic: 'Test email reminder system'
+    });
     if (deleted.deletedCount > 0) {
       console.log(`🗑️  Deleted ${deleted.deletedCount} old test session(s)`);
     }
@@ -36,8 +38,10 @@ async function createTestSession() {
     }
 
     const now = new Date();
-    const sessionStart = new Date(now.getTime() + 16 * 60 * 1000); // 16 phút sau
-    const sessionEnd = new Date(sessionStart.getTime() + 90 * 60 * 1000); // 90 phút học
+    
+    // Tạo session cho hôm nay, bắt đầu sau 16 phút
+    const sessionStart = new Date(now.getTime() + 16 * 60 * 1000);
+    const sessionEnd = new Date(sessionStart.getTime() + 90 * 60 * 1000);
 
     const h = sessionStart.getHours();
     const m = sessionStart.getMinutes();
@@ -49,7 +53,8 @@ async function createTestSession() {
 
     const sessionType = h >= 6 && h < 12 ? 'morning' : h >= 12 && h < 18 ? 'afternoon' : 'evening';
 
-    const sessionDate = new Date(sessionStart);
+    // Set date to today at midnight
+    const sessionDate = new Date(now);
     sessionDate.setHours(0,0,0,0);
 
     const testSession = await StudySessionSchedule.create({
@@ -61,8 +66,7 @@ async function createTestSession() {
       sessionType: sessionType,
       startTime: startTime,
       endTime: endTime,
-      topic: 'TEST EMAIL REMINDER',
-      objectives: ['Test email reminder system'],
+      topic: 'Test email reminder system',
       status: 'scheduled',
       plannedDuration: 90
     });

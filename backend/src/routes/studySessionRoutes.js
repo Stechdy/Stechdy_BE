@@ -24,6 +24,9 @@ router.get('/stats', studySessionController.getStudyStats);
 // Get all study sessions with filters
 router.get('/', studySessionController.getStudySessions);
 
+// Get sessions by subject (for subject detail page)
+router.get('/subject/:subjectId', studySessionController.getSessionsBySubject);
+
 // Get a single study session
 router.get('/:id', studySessionController.getStudySession);
 

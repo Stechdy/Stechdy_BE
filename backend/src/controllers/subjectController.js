@@ -35,6 +35,31 @@ const getSubjects = async (req, res) => {
   }
 };
 
+// @desc    Get a single subject by ID
+// @route   GET /api/subjects/:id
+// @access  Private
+const getSubjectById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('📚 Fetching subject by ID:', id);
+
+    const subject = await Subject.findById(id)
+      .select('subjectName color credits instructor schedule semesterId');
+
+    if (!subject) {
+      return res.status(404).json({ message: 'Subject not found' });
+    }
+
+    console.log('✅ Found subject:', subject.subjectName);
+
+    res.json(subject);
+  } catch (error) {
+    console.error('❌ Error fetching subject:', error);
+    res.status(500).json({ message: 'Server error fetching subject' });
+  }
+};
+
 module.exports = {
-  getSubjects
+  getSubjects,
+  getSubjectById
 };
