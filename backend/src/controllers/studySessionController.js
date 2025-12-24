@@ -98,6 +98,31 @@ exports.getTodaySessions = async (req, res) => {
   }
 };
 
+// Get sessions by subject ID
+exports.getSessionsBySubject = async (req, res) => {
+  try {
+    const { subjectId } = req.params;
+    const userId = req.user._id;
+
+    console.log('📚 Fetching sessions for subject:', subjectId);
+
+    const sessions = await StudySessionSchedule.find({
+      userId,
+      subjectId
+    })
+      .populate('subjectId', 'subjectName color subjectCode')
+      .sort({ date: -1, startTime: 1 })
+      .lean();
+
+    console.log(`✅ Found ${sessions.length} sessions for subject`);
+
+    res.json(sessions);
+  } catch (error) {
+    console.error('❌ Error fetching sessions by subject:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 // Get all study sessions for a date range
 exports.getStudySessions = async (req, res) => {
   try {
@@ -167,8 +192,6 @@ exports.createStudySession = async (req, res) => {
       sessionType,
       startTime,
       endTime,
-      topic,
-      objectives,
       plannedDuration,
       notes
     } = req.body;
@@ -205,8 +228,6 @@ exports.createStudySession = async (req, res) => {
       sessionType,
       startTime,
       endTime,
-      topic,
-      objectives: objectives || [],
       plannedDuration: plannedDuration || 90,
       notes,
       status: 'scheduled',
@@ -238,7 +259,7 @@ exports.updateStudySession = async (req, res) => {
     }
 
     // Track if this is a user edit
-    if (['date', 'startTime', 'endTime', 'topic', 'sessionType'].some(field => updates[field])) {
+    if (['date', 'startTime', 'endTime', 'sessionType'].some(field => updates[field])) {
       updates.isUserEdited = true;
       
       // Add to edit history
@@ -275,7 +296,7 @@ exports.completeStudySession = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user._id;
-    const { focusLevel, notes, completedTopics, actualDuration, wasProductived } = req.body;
+    const { focusLevel, notes, completedTopics, actualDuration } = req.body;
 
     const session = await StudySessionSchedule.findOne({ _id: id, userId });
 
@@ -284,7 +305,7 @@ exports.completeStudySession = async (req, res) => {
     }
 
     // Use the complete method from the model
-    await session.complete(focusLevel, notes, completedTopics, actualDuration, wasProductived);
+    await session.complete(focusLevel, notes, completedTopics, actualDuration);
 
     const updatedSession = await StudySessionSchedule.findById(id)
       .populate('subjectId', 'subjectName color subjectCode')
@@ -598,7 +619,6 @@ exports.endSession = async (req, res) => {
     session.focusLevel = focusLevel || 3;
     session.completionNotes = completionNotes || '';
     session.completedTopics = completedTopics || [];
-    session.wasProductived = actualDuration >= 30; // Productive nếu học >= 30 phút
     
     await session.save();
     

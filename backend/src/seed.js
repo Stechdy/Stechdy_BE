@@ -1323,29 +1323,29 @@ async function seedDatabase() {
             endDate: new Date('2025-12-21'),
             sessions: [
               // Monday
-              { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'morning', subjectId: aiSubjects[0]._id, subjectName: 'DS&A', startTime: '07:00', endTime: '08:30', topic: 'Graph Algorithms - BFS/DFS', objectives: ['Understand BFS traversal', 'Implement DFS recursively'] },
-              { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'evening', subjectId: aiSubjects[2]._id, subjectName: 'OS', startTime: '19:00', endTime: '20:30', topic: 'Memory Management Review', objectives: ['Study paging concepts', 'Review virtual memory'] },
+              { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'morning', subjectId: aiSubjects[0]._id, subjectName: 'DS&A', startTime: '07:00', endTime: '08:30', topic: 'Graph Algorithms - BFS/DFS' },
+              { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'evening', subjectId: aiSubjects[2]._id, subjectName: 'OS', startTime: '19:00', endTime: '20:30', topic: 'Memory Management Review' },
               
               // Tuesday
-              { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'morning', subjectId: aiSubjects[2]._id, subjectName: 'OS', startTime: '07:00', endTime: '08:30', topic: 'Threads & Concurrency', objectives: ['Understand thread lifecycle', 'Study synchronization primitives'] },
-              { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'afternoon', subjectId: aiSubjects[1]._id, subjectName: 'Database', startTime: '12:30', endTime: '14:00', topic: 'Database Project Work', objectives: ['Design schema tables', 'Write complex SQL queries'] },
-              { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'evening', subjectId: aiSubjects[4]._id, subjectName: 'Linear Algebra', startTime: '19:00', endTime: '20:30', topic: 'Eigenvalues Practice', objectives: ['Solve eigenvalue problems', 'Practice diagonalization'] },
+              { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'morning', subjectId: aiSubjects[2]._id, subjectName: 'OS', startTime: '07:00', endTime: '08:30', topic: 'Threads & Concurrency' },
+              { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'afternoon', subjectId: aiSubjects[1]._id, subjectName: 'Database', startTime: '12:30', endTime: '14:00', topic: 'Database Project Work' },
+              { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'evening', subjectId: aiSubjects[4]._id, subjectName: 'Linear Algebra', startTime: '19:00', endTime: '20:30', topic: 'Eigenvalues Practice' },
               
               // Wednesday
-              { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'morning', subjectId: aiSubjects[0]._id, subjectName: 'DS&A', startTime: '07:00', endTime: '08:30', topic: 'Graph Assignment Work', objectives: ['Code Dijkstra algorithm', 'Test with sample graphs'] },
-              { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'afternoon', subjectId: aiSubjects[3]._id, subjectName: 'Web Dev', startTime: '12:30', endTime: '14:00', topic: 'Portfolio Project - Final touches', objectives: ['Add animations', 'Deploy to Vercel'] },
-              { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'evening', subjectId: aiSubjects[1]._id, subjectName: 'Database', startTime: '19:00', endTime: '21:00', topic: 'Database Project Final Push', objectives: ['Test all queries', 'Write documentation'] },
+              { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'morning', subjectId: aiSubjects[0]._id, subjectName: 'DS&A', startTime: '07:00', endTime: '08:30', topic: 'Graph Assignment Work' },
+              { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'afternoon', subjectId: aiSubjects[3]._id, subjectName: 'Web Dev', startTime: '12:30', endTime: '14:00', topic: 'Portfolio Project - Final touches' },
+              { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'evening', subjectId: aiSubjects[1]._id, subjectName: 'Database', startTime: '19:00', endTime: '21:00', topic: 'Database Project Final Push' },
               
               // Thursday
-              { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'morning', subjectId: aiSubjects[4]._id, subjectName: 'Linear Algebra', startTime: '07:00', endTime: '08:30', topic: 'Midterm Review', objectives: ['Review all formulas', 'Practice past papers'] },
-              { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'afternoon', subjectId: aiSubjects[2]._id, subjectName: 'OS', startTime: '12:00', endTime: '13:30', topic: 'OS Exam Preparation', objectives: ['Review lecture notes', 'Make summary sheets'] },
-              { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'evening', subjectId: aiSubjects[0]._id, subjectName: 'DS&A', startTime: '19:00', endTime: '20:30', topic: 'Final Assignment Review', objectives: ['Debug graph code', 'Optimize algorithms'] },
+              { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'morning', subjectId: aiSubjects[4]._id, subjectName: 'Linear Algebra', startTime: '07:00', endTime: '08:30', topic: 'Midterm Review' },
+              { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'afternoon', subjectId: aiSubjects[2]._id, subjectName: 'OS', startTime: '12:00', endTime: '13:30', topic: 'OS Exam Preparation' },
+              { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'evening', subjectId: aiSubjects[0]._id, subjectName: 'DS&A', startTime: '19:00', endTime: '20:30', topic: 'Final Assignment Review' },
               
               // Friday (light day before work)
-              { date: new Date('2025-12-20'), dayOfWeek: 5, sessionType: 'morning', subjectId: aiSubjects[2]._id, subjectName: 'OS', startTime: '07:00', endTime: '08:30', topic: 'OS Final Prep', objectives: ['Practice questions', 'Review weak areas'] },
+              { date: new Date('2025-12-20'), dayOfWeek: 5, sessionType: 'morning', subjectId: aiSubjects[2]._id, subjectName: 'OS', startTime: '07:00', endTime: '08:30', topic: 'OS Final Prep' },
               
               // Saturday (work day - evening study only)
-              { date: new Date('2025-12-21'), dayOfWeek: 6, sessionType: 'evening', subjectId: aiSubjects[0]._id, subjectName: 'DS&A', startTime: '19:00', endTime: '20:30', topic: 'Light Review', objectives: ['Review completed topics', 'Plan next week'] }
+              { date: new Date('2025-12-21'), dayOfWeek: 6, sessionType: 'evening', subjectId: aiSubjects[0]._id, subjectName: 'DS&A', startTime: '19:00', endTime: '20:30', topic: 'Light Review' }
             ],
             totalStudyHours: 22.5,
             subjectDistribution: {
@@ -1410,53 +1410,83 @@ async function seedDatabase() {
     
     const sessionsToCreate = [
       // WEEK 49 - Monday Dec 9
-      { date: new Date('2025-12-09'), dayOfWeek: 1, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Data Structures Review', objectives: ['Review linked lists', 'Practice tree traversals'] },
-      { date: new Date('2025-12-09'), dayOfWeek: 1, sessionType: 'afternoon', subjectId: aiSubjects[1]._id, startTime: '14:00', endTime: '15:30', topic: 'SQL Basics', objectives: ['Learn SELECT queries', 'Practice JOINs'] },
-      { date: new Date('2025-12-09'), dayOfWeek: 1, sessionType: 'evening', subjectId: aiSubjects[3]._id, startTime: '19:00', endTime: '20:30', topic: 'React Components', objectives: ['Build reusable components', 'Understand props'] },
+      { date: new Date('2025-12-09'), dayOfWeek: 1, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Data Structures Review' },
+      { date: new Date('2025-12-09'), dayOfWeek: 1, sessionType: 'afternoon', subjectId: aiSubjects[1]._id, startTime: '14:00', endTime: '15:30', topic: 'SQL Basics' },
+      { date: new Date('2025-12-09'), dayOfWeek: 1, sessionType: 'evening', subjectId: aiSubjects[3]._id, startTime: '19:00', endTime: '20:30', topic: 'React Components' },
       // Tuesday Dec 10
-      { date: new Date('2025-12-10'), dayOfWeek: 2, sessionType: 'morning', subjectId: aiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'Process Scheduling', objectives: ['Study scheduling algorithms', 'Compare FCFS vs RR'] },
-      { date: new Date('2025-12-10'), dayOfWeek: 2, sessionType: 'afternoon', subjectId: aiSubjects[4]._id, startTime: '13:00', endTime: '14:30', topic: 'Matrix Operations', objectives: ['Practice matrix multiplication', 'Learn determinants'] },
-      { date: new Date('2025-12-10'), dayOfWeek: 2, sessionType: 'evening', subjectId: aiSubjects[0]._id, startTime: '19:00', endTime: '20:30', topic: 'Algorithm Analysis', objectives: ['Big O notation', 'Time complexity'] },
+      { date: new Date('2025-12-10'), dayOfWeek: 2, sessionType: 'morning', subjectId: aiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'Process Scheduling' },
+      { date: new Date('2025-12-10'), dayOfWeek: 2, sessionType: 'afternoon', subjectId: aiSubjects[4]._id, startTime: '13:00', endTime: '14:30', topic: 'Matrix Operations' },
+      { date: new Date('2025-12-10'), dayOfWeek: 2, sessionType: 'evening', subjectId: aiSubjects[0]._id, startTime: '19:00', endTime: '20:30', topic: 'Algorithm Analysis' },
       // Wednesday Dec 11
-      { date: new Date('2025-12-11'), dayOfWeek: 3, sessionType: 'morning', subjectId: aiSubjects[1]._id, startTime: '07:00', endTime: '08:30', topic: 'Database Normalization', objectives: ['Understand 1NF, 2NF, 3NF', 'Design normalized schemas'] },
-      { date: new Date('2025-12-11'), dayOfWeek: 3, sessionType: 'afternoon', subjectId: aiSubjects[3]._id, startTime: '14:00', endTime: '15:30', topic: 'State Management', objectives: ['Learn useState', 'Practice with forms'] },
-      { date: new Date('2025-12-11'), dayOfWeek: 3, sessionType: 'evening', subjectId: aiSubjects[2]._id, startTime: '19:00', endTime: '20:30', topic: 'Memory Management', objectives: ['Study paging', 'Understand virtual memory'] },
+      { date: new Date('2025-12-11'), dayOfWeek: 3, sessionType: 'morning', subjectId: aiSubjects[1]._id, startTime: '07:00', endTime: '08:30', topic: 'Database Normalization' },
+      { date: new Date('2025-12-11'), dayOfWeek: 3, sessionType: 'afternoon', subjectId: aiSubjects[3]._id, startTime: '14:00', endTime: '15:30', topic: 'State Management' },
+      { date: new Date('2025-12-11'), dayOfWeek: 3, sessionType: 'evening', subjectId: aiSubjects[2]._id, startTime: '19:00', endTime: '20:30', topic: 'Memory Management' },
       // Thursday Dec 12
-      { date: new Date('2025-12-12'), dayOfWeek: 4, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Sorting Algorithms', objectives: ['Implement QuickSort', 'Compare sorting methods'] },
-      { date: new Date('2025-12-12'), dayOfWeek: 4, sessionType: 'afternoon', subjectId: aiSubjects[4]._id, startTime: '13:00', endTime: '14:30', topic: 'Vector Spaces', objectives: ['Practice linear transformations', 'Solve eigenvalue problems'] },
+      { date: new Date('2025-12-12'), dayOfWeek: 4, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Sorting Algorithms' },
+      { date: new Date('2025-12-12'), dayOfWeek: 4, sessionType: 'afternoon', subjectId: aiSubjects[4]._id, startTime: '13:00', endTime: '14:30', topic: 'Vector Spaces' },
       // Friday Dec 13
-      { date: new Date('2025-12-13'), dayOfWeek: 5, sessionType: 'morning', subjectId: aiSubjects[1]._id, startTime: '07:00', endTime: '08:30', topic: 'Advanced SQL', objectives: ['Learn subqueries', 'Practice views and indexes'] },
-      { date: new Date('2025-12-13'), dayOfWeek: 5, sessionType: 'afternoon', subjectId: aiSubjects[3]._id, startTime: '14:00', endTime: '15:30', topic: 'API Integration', objectives: ['Fetch data from APIs', 'Handle async operations'] },
+      { date: new Date('2025-12-13'), dayOfWeek: 5, sessionType: 'morning', subjectId: aiSubjects[1]._id, startTime: '07:00', endTime: '08:30', topic: 'Advanced SQL' },
+      { date: new Date('2025-12-13'), dayOfWeek: 5, sessionType: 'afternoon', subjectId: aiSubjects[3]._id, startTime: '14:00', endTime: '15:30', topic: 'API Integration' },
       // Sunday Dec 14
-      { date: new Date('2025-12-14'), dayOfWeek: 0, sessionType: 'morning', subjectId: aiSubjects[4]._id, startTime: '09:00', endTime: '10:30', topic: 'Linear Algebra Review', objectives: ['Review all topics', 'Practice exam questions'] },
-      { date: new Date('2025-12-14'), dayOfWeek: 0, sessionType: 'afternoon', subjectId: aiSubjects[0]._id, startTime: '14:00', endTime: '15:30', topic: 'Algorithm Practice', objectives: ['Solve coding problems', 'Prepare for interview'] },
+      { date: new Date('2025-12-14'), dayOfWeek: 0, sessionType: 'morning', subjectId: aiSubjects[4]._id, startTime: '09:00', endTime: '10:30', topic: 'Linear Algebra Review' },
+      { date: new Date('2025-12-14'), dayOfWeek: 0, sessionType: 'afternoon', subjectId: aiSubjects[0]._id, startTime: '14:00', endTime: '15:30', topic: 'Algorithm Practice' },
       
       // WEEK 50 - Monday Dec 16
-      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Graph Algorithms - BFS/DFS', objectives: ['Understand BFS traversal', 'Implement DFS recursively'] },
-      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'evening', subjectId: aiSubjects[2]._id, startTime: '19:00', endTime: '20:30', topic: 'Memory Management Review', objectives: ['Study paging concepts', 'Review virtual memory'] },
+      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Graph Algorithms - BFS/DFS' },
+      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'evening', subjectId: aiSubjects[2]._id, startTime: '19:00', endTime: '20:30', topic: 'Memory Management Review' },
       // Tuesday Dec 17
-      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'morning', subjectId: aiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'Threads & Concurrency', objectives: ['Understand thread lifecycle', 'Study synchronization primitives'] },
-      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'afternoon', subjectId: aiSubjects[1]._id, startTime: '12:30', endTime: '14:00', topic: 'Database Project Work', objectives: ['Design schema tables', 'Write complex SQL queries'] },
-      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'evening', subjectId: aiSubjects[4]._id, startTime: '19:00', endTime: '20:30', topic: 'Eigenvalues Practice', objectives: ['Solve eigenvalue problems', 'Practice diagonalization'] },
+      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'morning', subjectId: aiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'Threads & Concurrency' },
+      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'afternoon', subjectId: aiSubjects[1]._id, startTime: '12:30', endTime: '14:00', topic: 'Database Project Work' },
+      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'evening', subjectId: aiSubjects[4]._id, startTime: '19:00', endTime: '20:30', topic: 'Eigenvalues Practice' },
       // Wednesday Dec 18
-      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Graph Assignment Work', objectives: ['Code Dijkstra algorithm', 'Test with sample graphs'] },
-      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'afternoon', subjectId: aiSubjects[3]._id, startTime: '12:30', endTime: '14:00', topic: 'Portfolio Project - Final touches', objectives: ['Add animations', 'Deploy to Vercel'] },
-      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'evening', subjectId: aiSubjects[1]._id, startTime: '19:00', endTime: '21:00', topic: 'Database Project Final Push', objectives: ['Test all queries', 'Write documentation'] },
+      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'morning', subjectId: aiSubjects[0]._id, startTime: '07:00', endTime: '08:30', topic: 'Graph Assignment Work' },
+      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'afternoon', subjectId: aiSubjects[3]._id, startTime: '12:30', endTime: '14:00', topic: 'Portfolio Project - Final touches' },
+      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'evening', subjectId: aiSubjects[1]._id, startTime: '19:00', endTime: '21:00', topic: 'Database Project Final Push' },
       // Thursday Dec 19
-      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'morning', subjectId: aiSubjects[4]._id, startTime: '07:00', endTime: '08:30', topic: 'Midterm Review', objectives: ['Review all formulas', 'Practice past papers'] },
-      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'afternoon', subjectId: aiSubjects[2]._id, startTime: '12:00', endTime: '13:30', topic: 'OS Exam Preparation', objectives: ['Review lecture notes', 'Make summary sheets'] },
-      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'evening', subjectId: aiSubjects[0]._id, startTime: '19:00', endTime: '20:30', topic: 'Final Assignment Review', objectives: ['Debug graph code', 'Optimize algorithms'] },
+      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'morning', subjectId: aiSubjects[4]._id, startTime: '07:00', endTime: '08:30', topic: 'Midterm Review' },
+      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'afternoon', subjectId: aiSubjects[2]._id, startTime: '12:00', endTime: '13:30', topic: 'OS Exam Preparation' },
+      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'evening', subjectId: aiSubjects[0]._id, startTime: '19:00', endTime: '20:30', topic: 'Final Assignment Review' },
       // Friday Dec 20
-      { date: new Date('2025-12-20'), dayOfWeek: 5, sessionType: 'morning', subjectId: aiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'OS Final Prep', objectives: ['Practice questions', 'Review weak areas'] },
+      { date: new Date('2025-12-20'), dayOfWeek: 5, sessionType: 'morning', subjectId: aiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'OS Final Prep' },
       // Saturday Dec 21
-      { date: new Date('2025-12-21'), dayOfWeek: 6, sessionType: 'evening', subjectId: aiSubjects[0]._id, startTime: '19:00', endTime: '20:30', topic: 'Light Review', objectives: ['Review completed topics', 'Plan next week'] },
+      { date: new Date('2025-12-21'), dayOfWeek: 6, sessionType: 'evening', subjectId: aiSubjects[0]._id, startTime: '19:00', endTime: '20:30', topic: 'Light Review' },
       // Sunday Dec 22
-      { date: new Date('2025-12-22'), dayOfWeek: 0, sessionType: 'morning', subjectId: aiSubjects[3]._id, startTime: '09:00', endTime: '10:30', topic: 'Full Stack Project', objectives: ['Build complete CRUD app', 'Deploy to production'] },
-      { date: new Date('2025-12-22'), dayOfWeek: 0, sessionType: 'afternoon', subjectId: aiSubjects[4]._id, startTime: '14:00', endTime: '15:30', topic: 'Math Review', objectives: ['Practice problems', 'Prepare for next week'] }
+      { date: new Date('2025-12-22'), dayOfWeek: 0, sessionType: 'morning', subjectId: aiSubjects[3]._id, startTime: '09:00', endTime: '10:30', topic: 'Full Stack Project' },
+      { date: new Date('2025-12-22'), dayOfWeek: 0, sessionType: 'afternoon', subjectId: aiSubjects[4]._id, startTime: '14:00', endTime: '15:30', topic: 'Math Review' }
     ];
     
     for (const sessionData of sessionsToCreate) {
       const isCompleted = sessionData.date < now;
+      
+      // Generate realistic completion data for completed sessions
+      let completionData = {};
+      if (isCompleted) {
+        // Parse the scheduled time
+        const [startHour, startMinute] = sessionData.startTime.split(':').map(Number);
+        const [endHour, endMinute] = sessionData.endTime.split(':').map(Number);
+        
+        // Create actual start/end times (slight variation from scheduled)
+        const actualStart = new Date(sessionData.date);
+        actualStart.setHours(startHour, startMinute + Math.floor(Math.random() * 10 - 2), 0, 0); // -2 to +8 minutes variance
+        
+        // Actual duration varies from 15-50 minutes (realistic study session)
+        const actualDurationMinutes = 15 + Math.floor(Math.random() * 36);
+        const actualEnd = new Date(actualStart.getTime() + actualDurationMinutes * 60 * 1000);
+        
+        completionData = {
+          actualStartTime: actualStart,
+          actualEndTime: actualEnd,
+          actualDuration: actualDurationMinutes,
+          focusLevel: Math.floor(Math.random() * 3) + 3, // 3-5
+          completionNotes: [
+            'Học được nhiều thứ',
+            'Hoàn thành tốt các mục tiêu',
+            'Cần ôn lại một số phần',
+            'Rất tập trung và hiệu quả',
+            'Đã nắm vững kiến thức cơ bản'
+          ][Math.floor(Math.random() * 5)]
+        };
+      }
       
       const newSession = await StudySessionSchedule.create({
         timetableId: studyTimetable._id,
@@ -1468,13 +1498,10 @@ async function seedDatabase() {
         startTime: sessionData.startTime,
         endTime: sessionData.endTime,
         topic: sessionData.topic,
-        objectives: sessionData.objectives,
         plannedDuration: 90,
         isUserEdited: false,
         status: isCompleted ? 'completed' : 'scheduled',
-        focusLevel: isCompleted ? Math.floor(Math.random() * 2) + 4 : undefined,
-        wasProductived: isCompleted ? true : undefined,
-        completedAt: isCompleted ? sessionData.date : undefined
+        ...completionData
       });
       
       aiStudySessions.push(newSession);
@@ -1772,30 +1799,93 @@ async function seedDatabase() {
     
     const taiSessionsToCreate = [
       // Monday Dec 16
-      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'morning', subjectId: taiSubjects[0]._id, startTime: '06:30', endTime: '08:00', topic: 'Web Dev Project - Authentication', objectives: ['Implement JWT auth', 'Add login/register pages'], focusLevel: 4 },
-      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'afternoon', subjectId: taiSubjects[1]._id, startTime: '14:00', endTime: '16:00', topic: 'ML Assignment - Neural Networks', objectives: ['Build simple neural network', 'Train on MNIST dataset'], focusLevel: 5 },
-      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'evening', subjectId: taiSubjects[2]._id, startTime: '19:00', endTime: '21:00', topic: 'Software Engineering - Testing', objectives: ['Write unit tests', 'Learn Jest framework'], focusLevel: 4 },
+      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'morning', subjectId: taiSubjects[0]._id, startTime: '06:30', endTime: '08:00', topic: 'JWT Authentication Implementation' },
+      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'afternoon', subjectId: taiSubjects[1]._id, startTime: '14:00', endTime: '16:00', topic: 'Neural Network & MNIST Training' },
+      { date: new Date('2025-12-16'), dayOfWeek: 1, sessionType: 'evening', subjectId: taiSubjects[2]._id, startTime: '19:00', endTime: '21:00', topic: 'Unit Testing with Jest' },
       // Tuesday Dec 17
-      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'morning', subjectId: taiSubjects[3]._id, startTime: '06:30', endTime: '08:00', topic: 'Mobile App - Navigation Setup', objectives: ['Configure React Navigation', 'Build screen structure'], focusLevel: 5 },
-      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'afternoon', subjectId: taiSubjects[4]._id, startTime: '14:00', endTime: '15:30', topic: 'Networks - Routing Protocols', objectives: ['Study RIP and OSPF', 'Practice routing tables'], focusLevel: 4 },
-      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'evening', subjectId: taiSubjects[0]._id, startTime: '19:00', endTime: '21:30', topic: 'Web Dev - Database Integration', objectives: ['Connect MongoDB', 'Create user schema'], focusLevel: 5 },
+      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'morning', subjectId: taiSubjects[3]._id, startTime: '06:30', endTime: '08:00', topic: 'React Navigation Setup' },
+      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'afternoon', subjectId: taiSubjects[4]._id, startTime: '14:00', endTime: '15:30', topic: 'RIP and OSPF Routing' },
+      { date: new Date('2025-12-17'), dayOfWeek: 2, sessionType: 'evening', subjectId: taiSubjects[0]._id, startTime: '19:00', endTime: '21:30', topic: 'MongoDB Integration' },
       // Wednesday Dec 18
-      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'morning', subjectId: taiSubjects[1]._id, startTime: '06:30', endTime: '08:30', topic: 'ML - Deep Learning Theory', objectives: ['Study CNN architecture', 'Review backpropagation'], focusLevel: 5 },
-      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'afternoon', subjectId: taiSubjects[2]._id, startTime: '14:00', endTime: '16:00', topic: 'SE - Agile Methodology', objectives: ['Study Scrum framework', 'Prepare presentation'], focusLevel: 4 },
-      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'evening', subjectId: taiSubjects[3]._id, startTime: '19:00', endTime: '21:00', topic: 'Mobile App - Feature Development', objectives: ['Build profile screen', 'Add image picker'], focusLevel: 4 },
+      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'morning', subjectId: taiSubjects[1]._id, startTime: '06:30', endTime: '08:30', topic: 'CNN Architecture Study' },
+      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'afternoon', subjectId: taiSubjects[2]._id, startTime: '14:00', endTime: '16:00', topic: 'Scrum Framework Preparation' },
+      { date: new Date('2025-12-18'), dayOfWeek: 3, sessionType: 'evening', subjectId: taiSubjects[3]._id, startTime: '19:00', endTime: '21:00', topic: 'Profile Screen Development' },
       // Thursday Dec 19
-      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'morning', subjectId: taiSubjects[0]._id, startTime: '06:30', endTime: '08:30', topic: 'Web Dev - Frontend Polish', objectives: ['Improve UI/UX', 'Add animations'], focusLevel: 4 },
-      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'afternoon', subjectId: taiSubjects[4]._id, startTime: '14:00', endTime: '15:30', topic: 'Networks - Security Concepts', objectives: ['Study encryption methods', 'Review firewalls'], focusLevel: 5 },
-      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'evening', subjectId: taiSubjects[1]._id, startTime: '19:00', endTime: '21:30', topic: 'ML Project Work', objectives: ['Train final model', 'Optimize hyperparameters'], focusLevel: 5 },
+      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'morning', subjectId: taiSubjects[0]._id, startTime: '06:30', endTime: '08:30', topic: 'UI/UX Enhancement' },
+      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'afternoon', subjectId: taiSubjects[4]._id, startTime: '14:00', endTime: '15:30', topic: 'Encryption & Firewalls' },
+      { date: new Date('2025-12-19'), dayOfWeek: 4, sessionType: 'evening', subjectId: taiSubjects[1]._id, startTime: '19:00', endTime: '21:30', topic: 'Model Training & Optimization' },
       // Friday Dec 20
-      { date: new Date('2025-12-20'), dayOfWeek: 5, sessionType: 'morning', subjectId: taiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'SE - Documentation', objectives: ['Write API docs', 'Create diagrams'], focusLevel: 3 },
-      { date: new Date('2025-12-20'), dayOfWeek: 5, sessionType: 'evening', subjectId: taiSubjects[3]._id, startTime: '19:00', endTime: '20:30', topic: 'Mobile App - Testing', objectives: ['Test all features', 'Fix bugs'], focusLevel: 4 },
+      { date: new Date('2025-12-20'), dayOfWeek: 5, sessionType: 'morning', subjectId: taiSubjects[2]._id, startTime: '07:00', endTime: '08:30', topic: 'API Documentation' },
+      { date: new Date('2025-12-20'), dayOfWeek: 5, sessionType: 'evening', subjectId: taiSubjects[3]._id, startTime: '19:00', endTime: '20:30', topic: 'Feature Testing & Bug Fixes' },
       // Saturday Dec 21
-      { date: new Date('2025-12-21'), dayOfWeek: 6, sessionType: 'morning', subjectId: taiSubjects[0]._id, startTime: '09:00', endTime: '11:00', topic: 'Web Dev - Final Review', objectives: ['Test deployment', 'Prepare demo'], focusLevel: 4 }
+      { date: new Date('2025-12-21'), dayOfWeek: 6, sessionType: 'morning', subjectId: taiSubjects[0]._id, startTime: '09:00', endTime: '11:00', topic: 'Deployment Testing' },
+      
+      // ===== TUẦN NÀY (Dec 23-29, 2025) =====
+      // Monday Dec 23
+      { date: new Date('2025-12-23'), dayOfWeek: 1, sessionType: 'morning', subjectId: taiSubjects[0]._id, startTime: '07:00', endTime: '09:00', topic: 'React Optimization' },
+      { date: new Date('2025-12-23'), dayOfWeek: 1, sessionType: 'afternoon', subjectId: taiSubjects[1]._id, startTime: '14:00', endTime: '16:30', topic: 'Model Accuracy Analysis' },
+      { date: new Date('2025-12-23'), dayOfWeek: 1, sessionType: 'evening', subjectId: taiSubjects[2]._id, startTime: '19:30', endTime: '21:30', topic: 'Code Review Practice' },
+      
+      // Tuesday Dec 24
+      { date: new Date('2025-12-24'), dayOfWeek: 2, sessionType: 'morning', subjectId: taiSubjects[3]._id, startTime: '07:00', endTime: '08:30', topic: 'Backend API Integration' },
+      { date: new Date('2025-12-24'), dayOfWeek: 2, sessionType: 'afternoon', subjectId: taiSubjects[4]._id, startTime: '14:30', endTime: '16:00', topic: 'Wireshark Network Analysis' },
+      { date: new Date('2025-12-24'), dayOfWeek: 2, sessionType: 'evening', subjectId: taiSubjects[0]._id, startTime: '20:00', endTime: '22:00', topic: 'API Security Implementation' },
+      
+      // Wednesday Dec 25
+      { date: new Date('2025-12-25'), dayOfWeek: 3, sessionType: 'morning', subjectId: taiSubjects[1]._id, startTime: '08:00', endTime: '10:00', topic: 'Transfer Learning Study' },
+      { date: new Date('2025-12-25'), dayOfWeek: 3, sessionType: 'afternoon', subjectId: taiSubjects[2]._id, startTime: '15:00', endTime: '17:00', topic: 'CI/CD with GitHub Actions' },
+      
+      // Thursday Dec 26
+      { date: new Date('2025-12-26'), dayOfWeek: 4, sessionType: 'morning', subjectId: taiSubjects[0]._id, startTime: '06:30', endTime: '08:30', topic: 'Production Deployment Preparation' },
+      { date: new Date('2025-12-26'), dayOfWeek: 4, sessionType: 'afternoon', subjectId: taiSubjects[3]._id, startTime: '14:00', endTime: '16:00', topic: 'UI Polish & UX Improvement' },
+      { date: new Date('2025-12-26'), dayOfWeek: 4, sessionType: 'evening', subjectId: taiSubjects[4]._id, startTime: '19:00', endTime: '21:00', topic: 'Network Security Review' },
+      
+      // Friday Dec 27
+      { date: new Date('2025-12-27'), dayOfWeek: 5, sessionType: 'morning', subjectId: taiSubjects[1]._id, startTime: '07:00', endTime: '09:00', topic: 'ML Project Presentation Prep' },
+      { date: new Date('2025-12-27'), dayOfWeek: 5, sessionType: 'afternoon', subjectId: taiSubjects[2]._id, startTime: '14:00', endTime: '15:30', topic: 'Documentation Writing' },
+      { date: new Date('2025-12-27'), dayOfWeek: 5, sessionType: 'evening', subjectId: taiSubjects[0]._id, startTime: '19:30', endTime: '21:00', topic: 'End-to-End Testing' },
+      
+      // Saturday Dec 28
+      { date: new Date('2025-12-28'), dayOfWeek: 6, sessionType: 'morning', subjectId: taiSubjects[3]._id, startTime: '09:00', endTime: '11:00', topic: 'App Store Submission' },
+      { date: new Date('2025-12-28'), dayOfWeek: 6, sessionType: 'afternoon', subjectId: taiSubjects[1]._id, startTime: '15:00', endTime: '17:00', topic: 'Code Refactoring' },
+      
+      // Sunday Dec 29
+      { date: new Date('2025-12-29'), dayOfWeek: 0, sessionType: 'morning', subjectId: taiSubjects[4]._id, startTime: '09:00', endTime: '11:00', topic: 'Final Exam Review' },
+      { date: new Date('2025-12-29'), dayOfWeek: 0, sessionType: 'afternoon', subjectId: taiSubjects[0]._id, startTime: '14:00', endTime: '16:00', topic: 'Portfolio Update' }
     ];
     
     for (const sessionData of taiSessionsToCreate) {
       const isCompleted = sessionData.date < now;
+      
+      // Generate realistic completion data for completed sessions
+      let completionData = {};
+      if (isCompleted) {
+        // Parse the scheduled time
+        const [startHour, startMinute] = sessionData.startTime.split(':').map(Number);
+        const [endHour, endMinute] = sessionData.endTime.split(':').map(Number);
+        
+        // Create actual start/end times (slight variation from scheduled)
+        const actualStart = new Date(sessionData.date);
+        actualStart.setHours(startHour, startMinute + Math.floor(Math.random() * 10 - 2), 0, 0); // -2 to +8 minutes variance
+        
+        // Actual duration varies from 20-60 minutes (realistic study session)
+        const actualDurationMinutes = 20 + Math.floor(Math.random() * 41);
+        const actualEnd = new Date(actualStart.getTime() + actualDurationMinutes * 60 * 1000);
+        
+        completionData = {
+          actualStartTime: actualStart,
+          actualEndTime: actualEnd,
+          actualDuration: actualDurationMinutes,
+          focusLevel: Math.floor(Math.random() * 3) + 3, // 3-5
+          completionNotes: [
+            'Hoàn thành xuất sắc',
+            'Đã hiểu rõ các khái niệm',
+            'Cần practice thêm',
+            'Session rất productive',
+            'Đạt được mục tiêu đề ra'
+          ][Math.floor(Math.random() * 5)]
+        };
+      }
       
       const newSession = await StudySessionSchedule.create({
         timetableId: taiTimetable._id,
@@ -1807,13 +1897,10 @@ async function seedDatabase() {
         startTime: sessionData.startTime,
         endTime: sessionData.endTime,
         topic: sessionData.topic,
-        objectives: sessionData.objectives,
         plannedDuration: 90,
         isUserEdited: false,
         status: isCompleted ? 'completed' : 'scheduled',
-        focusLevel: isCompleted ? sessionData.focusLevel : undefined,
-        wasProductived: isCompleted ? true : undefined,
-        completedAt: isCompleted ? sessionData.date : undefined
+        ...completionData
       });
       
       taiStudySessions.push(newSession);
@@ -1821,16 +1908,16 @@ async function seedDatabase() {
     console.log(`✅ Created ${taiStudySessions.length} study sessions for Tai`);
 
     console.log('\n📊 AI SCHEDULING SYSTEM DATA SUMMARY:');
-    console.log(`   Semesters: ${semesters.length}`);
-    console.log(`   Subjects: ${subjects.length}`);
+    console.log(`   Semesters: ${semesters.length + 1} (Alex + Tai)`);
+    console.log(`   Subjects: ${aiSubjects.length + taiSubjects.length} (Alex: ${aiSubjects.length}, Tai: ${taiSubjects.length})`);
     console.log(`   Busy Schedules: ${busySchedules.length}`);
     console.log(`   Deadlines: ${deadlines.length}`);
-    console.log(`   Study Sessions: ${studySessions.length}`);
+    console.log(`   Study Sessions: ${aiStudySessions.length + taiStudySessions.length} (Alex: ${aiStudySessions.length}, Tai: ${taiStudySessions.length})`);
     console.log(`   Reminders: ${reminders.length}`);
     console.log(`   Notification Logs: ${notificationLogs.length}`);
     console.log(`   AI Inputs: 1`);
     console.log(`   AI Generation Results: 1`);
-    console.log(`   Study Timetables: 1`);
+    console.log(`   Study Timetables: 2 (Alex + Tai)`);
 
   } catch (error) {
     console.error('❌ Error seeding database:', error);

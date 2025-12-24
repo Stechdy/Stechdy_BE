@@ -155,21 +155,27 @@ Individual study blocks in a timetable.
 - `dayOfWeek`: 0-6
 - `sessionType`: morning | afternoon | evening (**MAX 3/day**)
 - `startTime` & `endTime`: HH:MM format
-- `topic`: What to study
 - `objectives`: Learning goals array
+- `resources`: Array of study resources (textbook, video, article, practice, notes)
 - `isUserEdited`: Track manual changes
 - `editHistory`: Array of edit logs
-- `status`: scheduled | in_progress | completed | skipped | rescheduled
-- `focusLevel`: 1-5 (post-session rating)
-- `wasProductived`: User self-assessment
+- `status`: scheduled | completed | missed
+- `actualStartTime` & `actualEndTime`: Actual study time
+- `actualDuration`: Actual time spent studying (minutes)
+- `focusLevel`: 1-5 (post-session rating by user)
+- `completionNotes`: Notes after completing session
+- `completedTopics`: Array of topics completed during session
+- `isPaused`: Session pause state
+- `pausedDuration`: Total paused time (minutes)
 
 **Important Constraint:**
 - Pre-save hook validates MAX 3 sessions per day per user
 
 **Methods:**
 - `getDurationMinutes()`: Session length
-- `complete(focusLevel, notes, completedTopics)`: Mark done
+- `complete(focusLevel, notes, completedTopics, actualDuration)`: Mark done
 - `reschedule(newDate, newStartTime, newEndTime)`: Move session
+- `getComputedStatus()`: Auto-detect missed sessions
 
 **Indexes:**
 - `userId` + `date` + `sessionType`

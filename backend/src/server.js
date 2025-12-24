@@ -43,6 +43,7 @@ app.use('/api/study-sessions', require('./routes/studySessionRoutes'));
 app.use('/api/moods', require('./routes/moodRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/session-reminder', require('./routes/sessionReminderRoutes'));
+app.use('/api/deadlines', require('./routes/deadlineRoutes'));
 
 // Welcome route
 app.get('/', (req, res) => {
