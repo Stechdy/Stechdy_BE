@@ -1,4 +1,5 @@
 const express = require('express');
+const http = require('http');
 const dotenv = require('dotenv');
 const cors = require('cors');
 
@@ -7,7 +8,11 @@ dotenv.config();
 
 const connectDB = require('./config/database');
 const { initializeScheduler } = require('./utils/scheduler');
+<<<<<<< HEAD
 const { startReminderScheduler } = require('./services/sessionReminderService');
+=======
+const { initializeSocket } = require('./services/socketService');
+>>>>>>> dev-Cong
 
 // Load env vars
 dotenv.config();
@@ -22,6 +27,7 @@ initializeScheduler();
 startReminderScheduler();
 
 const app = express();
+const server = http.createServer(app);
 
 // Middleware
 app.use(cors());
@@ -56,6 +62,9 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  
+  // Initialize Socket.IO after server starts
+  initializeSocket(server);
 });

@@ -1,4 +1,5 @@
 const Notification = require('../models/Notification');
+const { sendNotificationRead, sendAllNotificationsRead, sendNotificationDeleted, sendUnreadCountUpdate } = require('../services/socketService');
 
 // @desc    Get user's notifications
 // @route   GET /api/notifications
@@ -55,6 +56,13 @@ exports.markAsRead = async (req, res) => {
       });
     }
 
+    // Emit realtime event
+    sendNotificationRead(userId, id);
+    
+    // Update unread count
+    const unreadCount = await Notification.countDocuments({ userId, read: false });
+    sendUnreadCountUpdate(userId, unreadCount);
+
     res.status(200).json({
       success: true,
       data: notification
@@ -81,6 +89,10 @@ exports.markAllAsRead = async (req, res) => {
       { read: true }
     );
 
+    // Emit realtime event
+    sendAllNotificationsRead(userId);
+    sendUnreadCountUpdate(userId, 0);
+
     res.status(200).json({
       success: true,
       message: 'Đã đánh dấu tất cả thông báo là đã đọc'
@@ -93,6 +105,7 @@ exports.markAllAsRead = async (req, res) => {
       error: error.message
     });
   }
+
 };
 
 // @desc    Delete notification
@@ -112,6 +125,13 @@ exports.deleteNotification = async (req, res) => {
       });
     }
 
+    // Emit realtime event
+    sendNotificationDeleted(userId, id);
+    
+    // Update unread count
+    const unreadCount = await Notification.countDocuments({ userId, read: false });
+    sendUnreadCountUpdate(userId, unreadCount);
+
     res.status(200).json({
       success: true,
       message: 'Đã xóa thông báo'
@@ -124,7 +144,14 @@ exports.deleteNotification = async (req, res) => {
       error: error.message
     });
   }
-};
+
+    console.error('Delete notification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi xóa thông báo',
+      error: error.message
+    });
+};  
 
 // @desc    Test send mood reminder
 // @route   POST /api/notifications/test-mood-reminder
@@ -160,3 +187,141 @@ exports.testMoodReminder = async (req, res) => {
     });
   }
 };
+
+// @desc    Test task reminder (for development)
+// @route   POST /api/notifications/test-task-reminder
+// @access  Private
+exports.testTaskReminder = async (req, res) => {
+  try {
+    const { sendTaskReminders } = require('../services/notificationService');
+    const result = await sendTaskReminders();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Task reminder test completed',
+      result
+    });
+  } catch (error) {
+    console.error('Test task reminder error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi test task reminder',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Test study session reminder (for development)
+// @route   POST /api/notifications/test-study-reminder
+// @access  Private
+exports.testStudyReminder = async (req, res) => {
+  try {
+    const { sendStudySessionReminders } = require('../services/notificationService');
+    const result = await sendStudySessionReminders();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Study session reminder test completed',
+      result
+    });
+  } catch (error) {
+    console.error('Test study reminder error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi test study reminder',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Test deadline reminder (for development)
+// @route   POST /api/notifications/test-deadline-reminder
+// @access  Private
+exports.testDeadlineReminder = async (req, res) => {
+  try {
+    const { sendDeadlineReminders } = require('../services/notificationService');
+    const result = await sendDeadlineReminders();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Deadline reminder test completed',
+      result
+    });
+  } catch (error) {
+    console.error('Test deadline reminder error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi test deadline reminder',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get mood analysis for current user
+// @route   GET /api/notifications/mood-analysis
+// @access  Private
+exports.getMoodAnalysis = async (req, res) => {
+  try {
+    const { analyzeMoodTrend, getCurrentEmotionalState, analyzeBestStudyTime } = require('../services/moodAnalysisService');
+    const userId = req.user._id;
+
+    const [weekTrend, emotionalState, bestStudyTime] = await Promise.all([
+      analyzeMoodTrend(userId, 7),
+      getCurrentEmotionalState(userId),
+      analyzeBestStudyTime(userId)
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        weekTrend,
+        emotionalState,
+        bestStudyTime
+      }
+    });
+  } catch (error) {
+    console.error('Get mood analysis error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi phân tích mood',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Create achievement notification
+// @route   POST /api/notifications/achievement
+// @access  Private
+exports.createAchievement = async (req, res) => {
+  try {
+    const { createAchievementNotification } = require('../services/notificationService');
+    const { achievementType, data } = req.body;
+    
+    if (!achievementType) {
+      return res.status(400).json({
+        success: false,
+        message: 'Achievement type is required'
+      });
+    }
+
+    const notification = await createAchievementNotification(
+      req.user._id,
+      achievementType,
+      data || {}
+    );
+
+    res.status(201).json({
+      success: true,
+      data: notification,
+      message: 'Achievement notification created'
+    });
+  } catch (error) {
+    console.error('Create achievement error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi tạo achievement notification',
+      error: error.message
+    });
+  }
+};
+
