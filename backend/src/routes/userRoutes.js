@@ -5,11 +5,13 @@ const {
   loginUser,
   getUserProfile,
   updateUserProfile,
+  getUserStreak,
 } = require('../controllers/userController');
 const { protect } = require('../middleware/auth');
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.route('/profile').get(protect, getUserProfile).put(protect, updateUserProfile);
+router.get('/streak', protect, getUserStreak);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Streak = require('../models/Streak');
 const jwt = require('jsonwebtoken');
 
 // Generate JWT Token
@@ -73,14 +74,28 @@ exports.loginUser = async (req, res) => {
 // @access  Private
 exports.getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    console.log('👤 Fetching profile for user:', req.user._id);
+    const user = await User.findById(req.user._id).select('-passwordHash');
 
     if (user) {
+      console.log('✅ User found:', user.name, 'Streak:', user.streakCount);
       res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
+        avatarUrl: user.avatarUrl,
+        level: user.level,
+        xp: user.xp,
+        streakCount: user.streakCount,
+        premiumStatus: user.premiumStatus,
+        bio: user.bio,
+        phone: user.phone,
+        timezone: user.timezone,
+        notificationSettings: user.notificationSettings,
+        settings: user.settings,
+        joinedAt: user.joinedAt,
+        lastLogin: user.lastLogin
       });
     } else {
       res.status(404).json({ message: 'User not found' });
@@ -117,6 +132,95 @@ exports.updateUserProfile = async (req, res) => {
       res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get user streak data
+// @route   GET /api/users/streak
+// @access  Private
+exports.getUserStreak = async (req, res) => {
+  try {
+    console.log('🔥 Fetching streak data for user:', req.user._id);
+    
+    const user = await User.findById(req.user._id);
+    const StudySessionSchedule = require('../models/StudySessionSchedule');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Get streak data from Streak model
+    const streak = await Streak.findOne({ userId: req.user._id });
+
+    // Calculate total study hours from completed sessions
+    const completedSessions = await StudySessionSchedule.find({
+      userId: req.user._id,
+      status: 'completed'
+    });
+
+    const totalMinutes = completedSessions.reduce((sum, session) => {
+      return sum + (session.actualDuration || session.plannedDuration || 90);
+    }, 0);
+    const totalHours = Math.floor(totalMinutes / 60);
+
+    // Get streak history - days user has logged in
+    let streakDays = [];
+    if (streak && streak.streakHistory) {
+      streakDays = streak.streakHistory.map(item => {
+        const date = new Date(item.date);
+        return {
+          day: date.getDate(),
+          month: date.getMonth() + 1,
+          year: date.getFullYear(),
+          fullDate: date.toISOString().split('T')[0]
+        };
+      });
+    }
+
+    // Get calendar data - combine streak history and completed sessions
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Get all days this month with login activity
+    const loginDaysThisMonth = streakDays
+      .filter(d => d.month === currentMonth + 1 && d.year === currentYear)
+      .map(d => d.day);
+
+    // Get all days this month with completed sessions
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+    const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+
+    const sessionsThisMonth = await StudySessionSchedule.find({
+      userId: req.user._id,
+      date: {
+        $gte: firstDayOfMonth,
+        $lte: lastDayOfMonth
+      },
+      status: 'completed'
+    });
+
+    const sessionDaysThisMonth = [...new Set(
+      sessionsThisMonth.map(session => new Date(session.date).getDate())
+    )];
+
+    // Combine login days and session days (unique)
+    const activeDays = [...new Set([...loginDaysThisMonth, ...sessionDaysThisMonth])].sort((a, b) => a - b);
+
+    console.log(`✅ Streak: ${streak?.currentStreak || user.streakCount} days, Total hours: ${totalHours}h, Active days: ${activeDays.length}`);
+
+    res.json({
+      currentStreak: streak?.currentStreak || user.streakCount || 0,
+      longestStreak: streak?.longestStreak || 0,
+      totalActiveDays: streak?.totalActiveDays || 0,
+      totalHours,
+      calendar: activeDays,
+      streakHistory: streakDays,
+      lastActiveDate: streak?.lastActiveDate || null
+    });
+  } catch (error) {
+    console.error('❌ Error fetching streak data:', error);
     res.status(500).json({ message: error.message });
   }
 };
