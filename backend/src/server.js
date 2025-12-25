@@ -8,11 +8,8 @@ dotenv.config();
 
 const connectDB = require('./config/database');
 const { initializeScheduler } = require('./utils/scheduler');
-<<<<<<< HEAD
 const { startReminderScheduler } = require('./services/sessionReminderService');
-=======
 const { initializeSocket } = require('./services/socketService');
->>>>>>> dev-Cong
 
 // Load env vars
 dotenv.config();

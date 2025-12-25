@@ -142,8 +142,6 @@ router.get('/confirm/:sessionId/:token', async (req, res) => {
         </style>
       </head>
       <body>
-            color: #b45309;
-          }
         </style>
       </head>
       <body>
