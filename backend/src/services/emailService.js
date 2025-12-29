@@ -723,8 +723,394 @@ const sendCompletionEmail = async (userEmail, sessionData) => {
   }
 };
 
+// Payment notification to admin
+const sendPaymentNotificationToAdmin = async (paymentData) => {
+  try {
+    const { userName, userEmail, planName, amount, paymentCode, paymentId, submittedAt } = paymentData;
+    
+    const adminEmail = 'stechdy.work@gmail.com';
+    const adminPanelUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin/payments`;
+    
+    const formattedDate = new Date(submittedAt).toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const formattedAmount = new Intl.NumberFormat('vi-VN').format(amount);
+
+    const mailOptions = {
+      from: `"Stechdy Payment System" <${process.env.EMAIL_USER}>`,
+      to: adminEmail,
+      subject: `💳 Xác nhận thanh toán mới - ${userName} - ${paymentCode}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              background-color: #f5f5f5;
+              margin: 0;
+              padding: 20px;
+            }
+            .container {
+              max-width: 600px;
+              margin: 0 auto;
+              background: white;
+              border-radius: 16px;
+              overflow: hidden;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            }
+            .header {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              padding: 30px;
+              text-align: center;
+            }
+            .header h1 {
+              color: white;
+              margin: 0;
+              font-size: 24px;
+            }
+            .content {
+              padding: 30px;
+            }
+            .info-box {
+              background: #f8f9fa;
+              border-radius: 12px;
+              padding: 20px;
+              margin: 20px 0;
+            }
+            .info-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 10px 0;
+              border-bottom: 1px solid #e0e0e0;
+            }
+            .info-row:last-child {
+              border-bottom: none;
+            }
+            .label {
+              font-weight: 600;
+              color: #555;
+            }
+            .value {
+              color: #333;
+              font-weight: 500;
+            }
+            .payment-code {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              padding: 15px;
+              border-radius: 8px;
+              text-align: center;
+              font-size: 20px;
+              font-weight: bold;
+              letter-spacing: 2px;
+              margin: 20px 0;
+            }
+            .btn {
+              display: inline-block;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              padding: 15px 40px;
+              text-decoration: none;
+              border-radius: 8px;
+              font-weight: 600;
+              text-align: center;
+              margin: 20px 0;
+            }
+            .btn:hover {
+              opacity: 0.9;
+            }
+            .footer {
+              background: #f8f9fa;
+              padding: 20px;
+              text-align: center;
+              color: #666;
+              font-size: 14px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>💳 Xác nhận thanh toán mới</h1>
+            </div>
+            <div class="content">
+              <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+                Có một yêu cầu thanh toán mới cần được xác minh:
+              </p>
+
+              <div class="payment-code">
+                ${paymentCode}
+              </div>
+
+              <div class="info-box">
+                <div class="info-row">
+                  <span class="label">Người dùng:</span>
+                  <span class="value">${userName}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Email:</span>
+                  <span class="value">${userEmail}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Gói đăng ký:</span>
+                  <span class="value">${planName}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Số tiền:</span>
+                  <span class="value" style="color: #10b981; font-weight: bold;">${formattedAmount}₫</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Thời gian xác nhận:</span>
+                  <span class="value">${formattedDate}</span>
+                </div>
+              </div>
+
+              <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #856404;">
+                  <strong>⚠️ Lưu ý:</strong> Vui lòng kiểm tra nội dung chuyển khoản có chứa mã <strong>${paymentCode}</strong>
+                </p>
+              </div>
+
+              <div style="text-align: center;">
+                <a href="${adminPanelUrl}" class="btn">
+                  🔍 Kiểm tra và xác minh
+                </a>
+              </div>
+
+              <p style="color: #666; font-size: 14px; margin-top: 30px; text-align: center;">
+                Thông tin chi tiết chuyển khoản:<br>
+                <strong>Tên TK:</strong> TRAN HUU TAI<br>
+                <strong>Số TK:</strong> 175678888<br>
+                <strong>Ngân hàng:</strong> VIB
+              </p>
+            </div>
+            <div class="footer">
+              <p>Email này được gửi tự động từ hệ thống Stechdy</p>
+              <p>© 2025 Stechdy. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Payment notification sent to admin for ${paymentCode}`);
+    return true;
+  } catch (error) {
+    console.error('❌ Error sending payment notification to admin:', error);
+    throw error;
+  }
+};
+
+// Payment confirmation to user
+const sendPaymentConfirmationToUser = async (userData) => {
+  try {
+    const { userEmail, userName, planName, amount, expiryDate } = userData;
+    
+    const formattedAmount = new Intl.NumberFormat('vi-VN').format(amount);
+    const formattedExpiry = new Date(expiryDate).toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+
+    const mailOptions = {
+      from: `"Stechdy Premium" <${process.env.EMAIL_USER}>`,
+      to: userEmail,
+      subject: `🎉 Thanh toán thành công - Chào mừng bạn đến với Stechdy Premium!`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              background-color: #f5f5f5;
+              margin: 0;
+              padding: 20px;
+            }
+            .container {
+              max-width: 600px;
+              margin: 0 auto;
+              background: white;
+              border-radius: 16px;
+              overflow: hidden;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            }
+            .header {
+              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+              padding: 40px;
+              text-align: center;
+            }
+            .header h1 {
+              color: white;
+              margin: 0;
+              font-size: 28px;
+            }
+            .icon {
+              font-size: 60px;
+              margin-bottom: 10px;
+            }
+            .content {
+              padding: 40px 30px;
+            }
+            .success-box {
+              background: #d1fae5;
+              border-left: 4px solid #10b981;
+              padding: 20px;
+              margin: 20px 0;
+              border-radius: 8px;
+            }
+            .info-box {
+              background: #f8f9fa;
+              border-radius: 12px;
+              padding: 20px;
+              margin: 20px 0;
+            }
+            .info-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 10px 0;
+              border-bottom: 1px solid #e0e0e0;
+            }
+            .info-row:last-child {
+              border-bottom: none;
+            }
+            .label {
+              font-weight: 600;
+              color: #555;
+            }
+            .value {
+              color: #333;
+              font-weight: 500;
+            }
+            .features {
+              margin: 30px 0;
+            }
+            .feature-item {
+              display: flex;
+              align-items: center;
+              padding: 10px 0;
+              color: #333;
+            }
+            .feature-item::before {
+              content: "✓";
+              background: #10b981;
+              color: white;
+              border-radius: 50%;
+              width: 24px;
+              height: 24px;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 12px;
+              font-weight: bold;
+            }
+            .btn {
+              display: inline-block;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              padding: 15px 40px;
+              text-decoration: none;
+              border-radius: 8px;
+              font-weight: 600;
+              text-align: center;
+              margin: 20px 0;
+            }
+            .footer {
+              background: #f8f9fa;
+              padding: 20px;
+              text-align: center;
+              color: #666;
+              font-size: 14px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="icon">🎉</div>
+              <h1>Thanh toán thành công!</h1>
+            </div>
+            <div class="content">
+              <div class="success-box">
+                <p style="margin: 0; color: #065f46; font-weight: 600;">
+                  Chúc mừng ${userName}! Thanh toán của bạn đã được xác nhận thành công.
+                </p>
+              </div>
+
+              <p style="font-size: 16px; color: #333; margin: 20px 0;">
+                Bạn đã chính thức trở thành thành viên Premium của Stechdy. Giờ đây bạn có thể tận hưởng tất cả các tính năng cao cấp!
+              </p>
+
+              <div class="info-box">
+                <div class="info-row">
+                  <span class="label">Gói đăng ký:</span>
+                  <span class="value">${planName}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Số tiền:</span>
+                  <span class="value" style="color: #10b981; font-weight: bold;">${formattedAmount}₫</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Hiệu lực đến:</span>
+                  <span class="value">${formattedExpiry}</span>
+                </div>
+              </div>
+
+              <h3 style="color: #333; margin-top: 30px;">🌟 Quyền lợi Premium của bạn:</h3>
+              <div class="features">
+                <div class="feature-item">Phân tích tiến độ nâng cao với AI</div>
+                <div class="feature-item">Không giới hạn mục tiêu học tập</div>
+                <div class="feature-item">Xuất dữ liệu học tập</div>
+                <div class="feature-item">Hỗ trợ email ưu tiên</div>
+                <div class="feature-item">Phân tích tâm trạng nâng cao</div>
+                <div class="feature-item">Tích hợp lịch thông minh</div>
+              </div>
+
+              <div style="text-align: center; margin-top: 30px;">
+                <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard" class="btn">
+                  🚀 Khám phá ngay
+                </a>
+              </div>
+
+              <p style="color: #666; font-size: 14px; margin-top: 30px; text-align: center;">
+                Nếu bạn có bất kỳ câu hỏi nào, đừng ngần ngại liên hệ với chúng tôi!
+              </p>
+            </div>
+            <div class="footer">
+              <p>Cảm ơn bạn đã tin tưởng và sử dụng Stechdy!</p>
+              <p>© 2025 Stechdy. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Payment confirmation sent to ${userEmail}`);
+    return true;
+  } catch (error) {
+    console.error('❌ Error sending payment confirmation to user:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   sendReminderEmail,
   sendStartSessionEmail,
-  sendCompletionEmail
+  sendCompletionEmail,
+  sendPaymentNotificationToAdmin,
+  sendPaymentConfirmationToUser
 };
+
