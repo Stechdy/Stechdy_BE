@@ -10,7 +10,14 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 // Generate JWT Token
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d',
+    expiresIn: '7d', // Access token valid for 7 days
+  });
+};
+
+// Generate Refresh Token
+const generateRefreshToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET, {
+    expiresIn: '30d', // Refresh token valid for 30 days
   });
 };
 
@@ -157,6 +164,14 @@ exports.register = async (req, res) => {
     if (user) {
       // Create initial streak record for new user
       const streakData = await updateUserStreak(user._id);
+      
+      // Generate tokens
+      const token = generateToken(user._id);
+      const refreshToken = generateRefreshToken(user._id);
+      
+      // Save refresh token to user
+      user.refreshToken = refreshToken;
+      await user.save();
 
       res.status(201).json({
         success: true,
@@ -168,7 +183,8 @@ exports.register = async (req, res) => {
           role: user.role,
           avatarUrl: user.avatarUrl,
           streakCount: streakData.currentStreak,
-          token: generateToken(user._id),
+          token,
+          refreshToken,
         },
       });
     }
@@ -240,6 +256,13 @@ exports.login = async (req, res) => {
     // Update streak on login
     const streakData = await updateUserStreak(user._id);
     user.streakCount = streakData.currentStreak;
+    
+    // Generate tokens
+    const token = generateToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+    
+    // Save refresh token to user
+    user.refreshToken = refreshToken;
     await user.save();
 
     res.json({
@@ -255,7 +278,8 @@ exports.login = async (req, res) => {
         level: user.level,
         xp: user.xp,
         streakCount: streakData.currentStreak,
-        token: generateToken(user._id),
+        token,
+        refreshToken,
       },
     });
   } catch (error) {
@@ -622,12 +646,14 @@ exports.googleLogin = async (req, res) => {
       });
     }
 
-    // Generate token
+    // Generate tokens
     const token = generateToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
 
     // Update streak on Google login
     const streakData = await updateUserStreak(user._id);
     user.streakCount = streakData.currentStreak;
+    user.refreshToken = refreshToken;
     await user.save();
 
     res.status(200).json({
@@ -643,6 +669,7 @@ exports.googleLogin = async (req, res) => {
         authProvider: user.authProvider,
         streakCount: streakData.currentStreak,
         token,
+        refreshToken,
       },
     });
   } catch (error) {
@@ -653,3 +680,92 @@ exports.googleLogin = async (req, res) => {
     });
   }
 };
+
+// @desc    Refresh access token
+// @route   POST /api/auth/refresh-token
+// @access  Public
+exports.refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: 'Refresh token không được cung cấp'
+      });
+    }
+
+    // Verify refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET);
+    
+    // Find user with this refresh token
+    const user = await User.findOne({ 
+      _id: decoded.id, 
+      refreshToken 
+    }).select('+refreshToken');
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Refresh token không hợp lệ'
+      });
+    }
+
+    // Generate new tokens
+    const newToken = generateToken(user._id);
+    const newRefreshToken = generateRefreshToken(user._id);
+
+    // Update refresh token in database
+    user.refreshToken = newRefreshToken;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Token đã được làm mới',
+      data: {
+        token: newToken,
+        refreshToken: newRefreshToken,
+      },
+    });
+  } catch (error) {
+    console.error('Refresh token error:', error);
+    
+    if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Refresh token không hợp lệ hoặc đã hết hạn'
+      });
+    }
+    
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Lỗi khi làm mới token'
+    });
+  }
+};
+
+// @desc    Logout user
+// @route   POST /api/auth/logout
+// @access  Private
+exports.logout = async (req, res) => {
+  try {
+    // Clear refresh token from database
+    const user = await User.findById(req.user.id);
+    if (user) {
+      user.refreshToken = null;
+      await user.save();
+    }
+
+    res.json({
+      success: true,
+      message: 'Đăng xuất thành công'
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Lỗi khi đăng xuất'
+    });
+  }
+};
+
