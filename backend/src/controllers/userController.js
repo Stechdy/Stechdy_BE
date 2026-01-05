@@ -89,6 +89,7 @@ exports.getUserProfile = async (req, res) => {
         xp: user.xp,
         streakCount: user.streakCount,
         premiumStatus: user.premiumStatus,
+        premiumExpiryDate: user.premiumExpiryDate,
         bio: user.bio,
         phone: user.phone,
         timezone: user.timezone,
@@ -102,6 +103,39 @@ exports.getUserProfile = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get current user data
+// @route   GET /api/users/me
+// @access  Private
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+
+    if (user) {
+      res.json({
+        success: true,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar,
+          premiumStatus: user.premiumStatus,
+          premiumExpiryDate: user.premiumExpiryDate,
+          streakCount: user.streakCount,
+          level: user.level,
+          xp: user.xp,
+          timezone: user.timezone,
+          joinedAt: user.joinedAt
+        }
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

@@ -45,6 +45,10 @@ const userSchema = new mongoose.Schema(
       enum: ['free', 'premium'],
       default: 'free'
     },
+    premiumExpiryDate: {
+      type: Date,
+      default: null
+    },
     joinedAt: {
       type: Date,
       default: Date.now
