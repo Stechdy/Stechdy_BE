@@ -200,6 +200,11 @@ const userSchema = new mongoose.Schema(
     verificationTokenExpire: {
       type: Date,
       default: null
+    },
+    refreshToken: {
+      type: String,
+      default: null,
+      select: false
     }
   },
   {

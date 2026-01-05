@@ -29,10 +29,20 @@ exports.createMoodEntry = async (req, res) => {
     const endOfDay = new Date(localTime);
     endOfDay.setUTCHours(23, 59, 59, 999);
 
+    console.log('createMoodEntry - Checking existing mood for today');
+    console.log('createMoodEntry - startOfDay:', startOfDay);
+    console.log('createMoodEntry - endOfDay:', endOfDay);
+    console.log('createMoodEntry - userId:', userId);
+
     const existingMood = await MoodTracking.findOne({
       userId,
       date: { $gte: startOfDay, $lte: endOfDay }
     });
+
+    console.log('createMoodEntry - existingMood found:', !!existingMood);
+    if (existingMood) {
+      console.log('createMoodEntry - existing mood date:', existingMood.date);
+    }
 
     if (existingMood) {
       // Update existing mood entry
@@ -41,6 +51,8 @@ exports.createMoodEntry = async (req, res) => {
       existingMood.note = note || '';
       existingMood.energyLevel = energyLevel || 5;
       await existingMood.save();
+
+      console.log('createMoodEntry - Updated existing mood');
 
       return res.status(200).json({
         success: true,
@@ -58,6 +70,9 @@ exports.createMoodEntry = async (req, res) => {
       energyLevel: energyLevel || 5,
       date: localTime
     });
+
+    console.log('createMoodEntry - Created new mood entry');
+    console.log('createMoodEntry - new mood date:', moodEntry.date);
 
     // Update Gamification: Add XP for mood check-in
     let gamification = await Gamification.findOne({ userId });
@@ -129,10 +144,28 @@ exports.getMoodEntries = async (req, res) => {
       if (endDate) query.date.$lte = new Date(endDate);
     }
 
+    console.log('getMoodEntries - userId:', userId);
+    console.log('getMoodEntries - query:', JSON.stringify(query));
+    console.log('getMoodEntries - limit:', limit);
+    console.log('getMoodEntries - startDate:', startDate);
+    console.log('getMoodEntries - endDate:', endDate);
+
+    // Check total moods for user first
+    const totalMoods = await MoodTracking.countDocuments({ userId });
+    console.log('getMoodEntries - TOTAL moods for user in DB:', totalMoods);
+
     const moods = await MoodTracking.find(query)
       .sort({ date: -1 })
       .limit(parseInt(limit))
       .populate('aiInsight');
+
+    console.log('getMoodEntries - found moods count:', moods.length);
+    console.log('getMoodEntries - mood details:', moods.map(m => ({
+      id: m._id,
+      date: m.date,
+      mood: m.mood,
+      energyLevel: m.energyLevel
+    })));
 
     res.status(200).json({
       success: true,
@@ -243,10 +276,29 @@ exports.getMoodStats = async (req, res) => {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - parseInt(days));
 
+    console.log('getMoodStats - userId:', userId);
+    console.log('getMoodStats - startDate:', startDate);
+
+    // First, let's see ALL mood entries for this user
+    const allMoods = await MoodTracking.find({ userId });
+    console.log('getMoodStats - TOTAL moods in DB for user:', allMoods.length);
+    console.log('getMoodStats - ALL mood dates:', allMoods.map(m => ({
+      id: m._id,
+      date: m.date,
+      mood: m.mood
+    })));
+
     const moods = await MoodTracking.find({
       userId,
       date: { $gte: startDate }
     }).sort({ date: -1 });
+
+    console.log('getMoodStats - found moods count (filtered):', moods.length);
+    console.log('getMoodStats - filtered mood dates:', moods.map(m => ({
+      id: m._id,
+      date: m.date,
+      mood: m.mood
+    })));
 
     // Calculate statistics
     const totalEntries = moods.length;
