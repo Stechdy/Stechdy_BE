@@ -9,6 +9,7 @@ const {
   logout,
   changePassword,
   googleLogin,
+  refreshToken,
 } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 
@@ -18,6 +19,7 @@ router.post('/login', login);
 router.post('/google', googleLogin);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:resetToken', resetPassword);
+router.post('/refresh-token', refreshToken);
 
 // Protected routes
 router.get('/me', protect, getMe);
