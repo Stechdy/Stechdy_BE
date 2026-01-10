@@ -15,6 +15,9 @@ router.get('/upcoming-by-subject', studySessionController.getUpcomingSessionsByS
 // Get weekly schedule (for study tracker)
 router.get('/week', studySessionController.getWeeklySchedule);
 
+// Get sessions by date range (for monthly view)
+router.get('/range', studySessionController.getSessionsByRange);
+
 // Get today's sessions (for dashboard)
 router.get('/today', studySessionController.getTodaySessions);
 
