@@ -11,14 +11,14 @@ exports.getNotifications = async (req, res) => {
 
     const query = { userId };
     if (unreadOnly === 'true') {
-      query.read = false;
+      query.isRead = false;
     }
 
     const notifications = await Notification.find(query)
       .sort({ createdAt: -1 })
       .limit(parseInt(limit));
 
-    const unreadCount = await Notification.countDocuments({ userId, read: false });
+    const unreadCount = await Notification.countDocuments({ userId, isRead: false });
 
     res.status(200).json({
       success: true,
@@ -45,7 +45,7 @@ exports.markAsRead = async (req, res) => {
 
     const notification = await Notification.findOneAndUpdate(
       { _id: id, userId },
-      { read: true },
+      { isRead: true, readAt: new Date() },
       { new: true }
     );
 
@@ -60,7 +60,7 @@ exports.markAsRead = async (req, res) => {
     sendNotificationRead(userId, id);
     
     // Update unread count
-    const unreadCount = await Notification.countDocuments({ userId, read: false });
+    const unreadCount = await Notification.countDocuments({ userId, isRead: false });
     sendUnreadCountUpdate(userId, unreadCount);
 
     res.status(200).json({
@@ -85,8 +85,8 @@ exports.markAllAsRead = async (req, res) => {
     const userId = req.user._id;
 
     await Notification.updateMany(
-      { userId, read: false },
-      { read: true }
+      { userId, isRead: false },
+      { isRead: true, readAt: new Date() }
     );
 
     // Emit realtime event
@@ -129,7 +129,7 @@ exports.deleteNotification = async (req, res) => {
     sendNotificationDeleted(userId, id);
     
     // Update unread count
-    const unreadCount = await Notification.countDocuments({ userId, read: false });
+    const unreadCount = await Notification.countDocuments({ userId, isRead: false });
     sendUnreadCountUpdate(userId, unreadCount);
 
     res.status(200).json({
@@ -169,7 +169,7 @@ exports.testMoodReminder = async (req, res) => {
       user._id,
       '🌟 Nhắc nhở: Ghi lại cảm xúc hôm nay!',
       'Đây là email test. Hãy dành vài giây để ghi lại cảm xúc của bạn.',
-      'mood_reminder'
+      'mood_checkin'
     );
 
     res.status(200).json({
