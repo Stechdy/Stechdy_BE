@@ -42,6 +42,8 @@ app.use("/api/notifications", require("./routes/notificationRoutes"));
 app.use("/api/session-reminder", require("./routes/sessionReminderRoutes"));
 app.use("/api/deadlines", require("./routes/deadlineRoutes"));
 app.use("/api/upload", require("./routes/uploadRoutes"));
+app.use('/api/payments', require('./routes/paymentRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Welcome route
 app.get("/", (req, res) => {

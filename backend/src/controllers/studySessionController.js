@@ -745,3 +745,65 @@ exports.getWeeklySchedule = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// Get sessions by date range (for monthly view)
+exports.getSessionsByRange = async (req, res) => {
+  try {
+    const { start, end } = req.query;
+    const userId = req.user._id;
+
+    console.log('📅 Fetching sessions by range for user:', userId);
+    console.log('📅 Date range:', { start, end });
+
+    if (!start || !end) {
+      return res.status(400).json({ message: 'Start and end dates are required' });
+    }
+
+    const rangeStart = new Date(start);
+    const rangeEnd = new Date(end);
+
+    // Find sessions in this date range
+    const sessions = await StudySessionSchedule.find({
+      userId,
+      date: {
+        $gte: rangeStart,
+        $lte: rangeEnd
+      }
+    })
+    .populate('subjectId', 'subjectName color subjectCode')
+    .sort({ date: 1, startTime: 1 })
+    .lean();
+
+    // Map sessions to include day of week and time slot
+    const mappedSessions = sessions.map(session => {
+      const sessionDate = new Date(session.date);
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const dayOfWeek = dayNames[sessionDate.getDay()];
+      
+      // Determine time slot based on start time
+      let timeSlot = 'Mor';
+      if (session.startTime) {
+        const hour = parseInt(session.startTime.split(':')[0]);
+        if (hour >= 12 && hour < 17) {
+          timeSlot = 'Aft';
+        } else if (hour >= 17) {
+          timeSlot = 'Eve';
+        }
+      }
+
+      return {
+        ...session,
+        dayOfWeek,
+        timeSlot,
+        subjectInfo: session.subjectId
+      };
+    });
+
+    console.log(`✅ Found ${mappedSessions.length} sessions in date range`);
+
+    res.json(mappedSessions);
+  } catch (error) {
+    console.error('❌ Error fetching sessions by range:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
